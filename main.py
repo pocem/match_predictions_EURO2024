@@ -133,6 +133,31 @@ for i in range(len(matches)):
     elif home_prediction == away_prediction and real_score_home == real_score_away:
         points += 2
 
+#TOP CHARTS ----------------------------------
+top_chart = {}
+
+
+def top_charts():
+    # Sort players by points (descending order)
+    sorted_players = sorted(player_credentials.items(), key=lambda x: x[1]['points'], reverse=True)
+
+    # Assign ranks and insert into database
+    rank = 1
+    for name, player_data in sorted_players:
+        # Copy player data without the 'password' key
+        player_info = {k: v for k, v in player_data.items() if k != 'password'}
+
+        # Add rank to player info
+        player_info['rank'] = rank
+
+        # Insert player information into the database
+        insert_query = "INSERT INTO top_charts (name, age, supporting, points, rank) VALUES (%s, %s, %s, %s, %s)"
+        val = (rank, name, player_data['age'], player_data['supporting_team'], player_data['points'])
+        myCursor.execute(insert_query, val)
+        mydb.commit()
+
+        # Increment rank for the next player
+        rank += 1
 
 
 
