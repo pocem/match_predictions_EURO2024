@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Predictor EURO 2024</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-image: url('images/bg.jpg'); /* Specify the path to your image */
+        background-size: cover; /* Cover the entire viewport */
+        background-position: center; /* Center the image */
+    }
+
+    .content {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+    #label{
+        width: 15px; /* Adjust the width as needed */
+        transform: translateY(-10%);
+    }
+
+    h1 {
+        font-size: 36px;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+    h2 {
+        font-size: 24px;
+        color: #ffffff;
+    }
+    h3 {
+        font-size: 20px;
+        color: #ffffff;
+        transform: translateX(-80%);
+    }
+    .matches td {
+        width: auto; 
+        font-size: 24px;
+        color: #ffffff;
+    }
+    .teams_text{
+        font-size: 24px;
+        color: white;
+        
+    }
+    
+</style>
+</head>
+<body>
+    <div class="content">
+        <h1>Match predictor EURO 2024</h1>
+        <h2>Day 1</h2>
+    </div>
+   
+    <div class="matches">
+        <table>
+            <tr>
+                
+                <td>
+                    <div>
+                        <h3>2024-06-14</h3>
+                    </div>
+                </td>
+                <td>
+                    <label class="teams_text"for="germanyScore" >GERMANY</label>
+                    <input type="text" id="label" name="germanyScore">
+                </td>
+                <td>:</td>
+                <td>
+                    <input type="text" id="label" name="scotlandScore">
+                    <label class="teams_text"for="scotlandScore">SCOTLAND</label>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

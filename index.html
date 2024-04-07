@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signup Form</title>
+<style>
+    .error {
+        color: red;
+    }
+    .container {
+        text-align: center;
+        margin-top: 100px;
+    }
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .signup-form,
+    .login-form {
+        display: none; /* Hide forms by default */
+        margin-top: 20px;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-image: url('your-image-path.jpg'); /* Specify the path to your image */
+        background-size: cover; /* Cover the entire viewport */
+        background-position: center; /* Center the image */
+    }
+
+    .content {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 36px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    h2 {
+        font-size: 24px;
+        color: #666;
+    }
+</style>
+</head>
+<body>
+    <div class="content">
+        <h1>Match predictor EURO 2024</h1>
+        <h2 id="welcomeText">Make an account and compete with other players for who is the best football analyst!</h2>
+    </div>
+
+<div class="container">
+    <button class="btn" onclick="showSignupForm()">Sign Up</button>
+    <button class="btn" onclick="showLoginForm()">Login</button>
+
+
+
+<form id="signupForm" class="signup-form" onsubmit="return validateForm()">
+    <h2>Signup Form</h2>
+    <div>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <span id="nameError" class="error"></span>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="passwordError" class="error"></span>
+    </div>
+    <div>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        <span id="ageError" class="error"></span>
+    </div>
+    <div>
+        <label for="supportingTeam">Supporting Team:</label>
+        <select id="supportingTeam" name="supportingTeam" required>
+            <option value="">Select Team</option>
+            <option value="Albania">Albania</option>
+            <option value="Austria">Austria</option>
+            <option value="Belgium">Belgium</option>
+            <option value="Croatia">Croatia</option>
+            <option value="Czech Republic">Czech Republic</option>
+            <option value="Denmark">Denmark</option>
+            <option value="England">England</option>
+            <option value="France">France</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Germany">Germany</option>
+            <option value="Hungary">Hungary</option>
+            <option value="Italy">Italy</option>
+            <option value="Netherlands">Netherlands</option>
+            <option value="Poland">Poland</option>
+            <option value="Portugal">Portugal</option>
+            <option value="Romania">Romania</option>
+            <option value="Scotland">Scotland</option>
+            <option value="Serbia">Serbia</option>
+            <option value="Slovakia">Slovakia</option>
+            <option value="Slovenia">Slovenia</option>
+            <option value="Spain">Spain</option>
+            <option value="Switzerland">Switzerland</option>
+            <option value="Turkey">Turkey</option>
+            <option value="Ukraine">Ukraine</option>
+        </select>
+        <span id="supportingTeamError" class="error"></span>
+    </div>
+    <div>
+        <button type="submit">Signup</button>
+    </div>
+</form>
+
+<form id="loginForm" class="login-form" onsubmit="return validateLoginForm()">
+    <h2>Login Form</h2>
+    <div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <span id="usernameError" class="error"></span>
+    </div>
+    <div>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="passwordError" class="error"></span>
+    </div>
+    <div>
+        <button type="submit">Login</button>
+    </div>
+</form>
+</div>
+
+<script>
+    function showSignupForm() {
+        document.getElementById("signupForm").style.display = "block";
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("welcomeText").style.visibility = "hidden";
+    }
+
+    function showLoginForm() {
+        document.getElementById("loginForm").style.display = "block";
+        document.getElementById("signupForm").style.display = "none";
+        document.getElementById("welcomeText").style.visibility = "hidden";
+    }
+    function validateSignupForm() {
+        var name = document.getElementById("name").value;
+        var password = document.getElementById("password").value;
+        var age = document.getElementById("age").value;
+        var supportingTeam = document.getElementById("supportingTeam").value;
+        var isValid = true;
+
+        // Reset previous error messages
+        document.getElementById("nameError").innerHTML = "";
+        document.getElementById("passwordError").innerHTML = "";
+        document.getElementById("ageError").innerHTML = "";
+        document.getElementById("supportingTeamError").innerHTML = "";
+
+        // Validate name
+        if (name.trim() === "") {
+            document.getElementById("nameError").innerHTML = "Name is required";
+            isValid = false;
+        }
+
+        // Validate password
+        if (password.trim() === "") {
+            document.getElementById("passwordError").innerHTML = "Password is required";
+            isValid = false;
+        }
+
+        // Validate age
+        if (isNaN(age) || age <= 0) {
+            document.getElementById("ageError").innerHTML = "Please enter a valid age";
+            isValid = false;
+        }
+
+        // Validate supporting team
+        if (supportingTeam === "") {
+            document.getElementById("supportingTeamError").innerHTML = "Please select a supporting team";
+            isValid = false;
+        }
+
+        // If form is valid, proceed with submission
+        return isValid;
+    }
+    function validateLoginForm() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    var isValid = true;
+
+    // Reset previous error messages
+    document.getElementById("usernameError").innerHTML = "";
+    document.getElementById("passwordError").innerHTML = "";
+
+    // Validate username
+    if (username.trim() === "") {
+        document.getElementById("usernameError").innerHTML = "Username is required";
+        isValid = false;
+    }
+
+    // Validate password
+    if (password.trim() === "") {
+        document.getElementById("passwordError").innerHTML = "Password is required";
+        isValid = false;
+    }
+
+    // You can add more extensive validation logic here if needed
+
+    // If form is valid, proceed with submission
+    return isValid;
+}
+
+</script>
+
+</body>
+</html>
