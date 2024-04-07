@@ -1,5 +1,5 @@
 import mysql.connector
-import json
+
 
 mydb = mysql.connector.connect(host="localhost", user="root", passwd="grepolismiso21", database="euro")
 
@@ -29,23 +29,6 @@ def signup():
     mydb.commit()
 
     print("Signup successful!")
-
-#STORE THE SIGNUP INFO--------------------
-def save_player_credentials(player_credentials):
-    filename = 'player_credentials.json'
-    with open(filename, 'w') as file:
-        json.dump(player_credentials, file)
-    print("Player credentials saved successfully.")
-
-#LOGIN------------------------------------
-def load_player_credentials():
-    try:
-        filename = 'player_credentials.json'
-        with open(filename, 'r') as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return {}
-
 
 
 def login():
