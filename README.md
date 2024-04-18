@@ -11,5 +11,5 @@ Basics of the application
 
 Build
 -SQL database
--Python back-end
--JavaScript front-end
+-Python backend
+-JavaScript frontend
