@@ -5,15 +5,15 @@ from flask_cors import CORS
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-import secrets
 
-
-secret_key = secrets.token_hex(16)
 
 mydb = mysql.connector.connect(host="localhost", user="root", passwd="grepolismiso21", database="euro")
 
 myCursor = mydb.cursor()
 app = Flask(__name__)
+with open('./.env', 'r') as file:
+    secret_key = file.read().strip()
+
 app.secret_key = secret_key
 login_manager = LoginManager(app)
 CORS(app)
