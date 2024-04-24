@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-image: url('images/bg.jpg'); /* Copy the path to your image */
+        background-size: cover; /* Cover the entire viewport */
+        background-position: center; /* Center the image */
+    }
+
+    .content {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+
+    h1 {
+        font-size: 36px;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 50px;
+        color: #ffffff;
+        overflow-y: auto; /* Add scrollbar if content exceeds container height */
+        max-height: 60vh; /* Set maximum height to prevent excessive scrolling */
+    }
+
+    th, td {
+        border: 1px solid #ffffff;
+        padding: 10px;
+    }
+
+    th {
+        background-color: #333333;
+    }
+
+    tr:nth-child(even) {
+        background-color: #555555;
+    }
+
+    tr:hover {
+        background-color: #242323;
+    }
+    
+    .btn {
+        margin-top: 30px;
+        font-size: large;
+    }
+</style>
+</head>
+<body>
+    <div class="content">
+        <h1>Match predictor EURO 2024</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Points</th>
+                    <th>Age</th>
+                    <th>Supporting Team</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be dynamically generated here -->
+                <tr>
+                    <td>1</td>
+                    <td>John</td>
+                    <td>100</td>
+                    <td>25</td>
+                    <td>Germany</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Alice</td>
+                    <td>90</td>
+                    <td>30</td>
+                    <td>France</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Raspusa</td>
+                    <td>50</td>
+                    <td>30</td>
+                    <td>Romania</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Jeppe</td>
+                    <td>120</td>
+                    <td>20</td>
+                    <td>Denmark</td>
+                </tr>
+                
+                
+                <!-- Add more rows as needed -->
+            </tbody>
+        </table>
+        <div>
+            <button class="btn" onclick="backToMain()">Back</button>
+        </div>
+    </div>
+<script>
+    function backToMain() {
+        window.location.href = "matches.html";
+    }
+</script>    
+</body>
+</html>

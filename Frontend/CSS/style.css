@@ -1,0 +1,68 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('images/bg.jpg'); /* Specify the path to your image */
+    background-size: cover; /* Cover the entire viewport */
+    background-position: center; /* Center the image */
+}
+
+.content {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+#label{
+    width: 15px; /* Adjust the width as needed */
+    transform: translateY(-20%);
+}
+
+h1 {
+    font-size: 36px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+h2 {
+    font-size: 30px;
+    color: #ffffff;
+    transform: translateY(+180%)
+}
+h3 {
+    font-size: 20px;
+    color: #ffffff;
+    transform: translate(-80%);
+}
+.matches td {
+    width: auto; 
+    font-size: 24px;
+    color: #ffffff;
+}
+.teams_text{
+    font-size: 24px;
+    color: white;
+    
+    
+}
+.btn {
+    position: relative;
+    transform: translate(-210%, 800%);
+    font-size: 18px;
+}
+#submitBtn {
+    position: relative;
+    transform: translate(-180%, +900%);
+    font-size: 18px;
+}
+.centered-table {
+    margin: 0 auto;
+}
+.boards {
+    transform: translate(550%, -600%);
+    font-size: 15px;
+    
+}
