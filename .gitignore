@@ -1,2 +1,4 @@
 /Match_predictions/Frontend/node_modules
-/.idea
+.idea
+/Match_predictions/Frontend/.vscode
+/Match_predictions/.env
