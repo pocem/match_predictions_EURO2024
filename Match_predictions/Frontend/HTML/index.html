@@ -88,17 +88,17 @@
 <form id="signupForm" class="signup-form" onsubmit="return validateSignupForm()">
     <h2>Signup Form</h2>
     <div class="credentials">
-        <label for="name" id="label">Name:</label>
+        <label for="name" class="label">Name:</label>
         <input type="text" id="name" name="name" required>
         <span id="nameError" class="error"></span>
     </div>
     <div class="credentials">
-        <label for="password" id="label">Password:</label>
+        <label for="password" class="label">Password:</label>
         <input type="password" id="password" name="password" required>
-        <span id="passwordError" class="error"></span>
+        <span id="signUpPasswordError" class="error"></span>
     </div>
     <div class="credentials">
-        <label for="age" id="label">Age:</label>
+        <label for="age" class="label">Age:</label>
         <input type="number" id="age" name="age" required>
         <span id="ageError" class="error"></span>
     </div>
@@ -148,7 +148,7 @@
     <div class="credentials">
         <label for="password">Password:</label>
         <input type="password" id="password2" name="password" required>
-        <span id="passwordError" class="error"></span>
+        <span id="logInPasswordError" class="error"></span>
     </div>
     <div>
         <button id="showMatches" type="submit">Login</button>
