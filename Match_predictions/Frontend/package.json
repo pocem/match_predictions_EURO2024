@@ -9,7 +9,10 @@
   "author": "Michal Grega",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "express": "^4.19.2",
-    "http": "^0.0.1-security"
+    "http": "^0.0.1-security",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }

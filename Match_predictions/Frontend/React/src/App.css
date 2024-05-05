@@ -1,0 +1,88 @@
+.button-hover {
+    transition: transform 0.3s ease-in-out;
+  }
+  
+.button-hover:hover {
+transform: scale(1.1);
+}
+
+.fly-in {
+  display: none;
+}
+
+@keyframes flyInAnimation {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.fly-in {
+  animation: flyInAnimation 0.8s ease forwards;
+}
+.date-cell {
+  padding-left: 20px;
+}
+.matches-body{
+  position: absolute;
+  top: 300px; 
+  left: 34%
+}
+.day-count {
+  position: absolute;
+  top: 220px; /* Adjust this value to set the distance from the bottom */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: large;
+}
+.main-body{
+  background-image: url('../../football bg.jpg');
+  height: 100vh;
+}
+
+#football {
+  position: fixed;
+  width: 50px;
+  height: 50px;
+  /* Add animation property */
+  animation: float 5s infinite alternate;
+}
+
+@keyframes float {
+  0% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-20px); }
+  100% { transform: translate(-50%, -50%) translateY(0); }
+}
+
+.white-color-text{
+  color:whitesmoke
+}
+.list-group-scroll {
+  max-height: 500px; /* Set max height for scrollbar */
+  overflow-y: auto; /* Enable vertical scrollbar */
+  scrollbar-width: thin ; /* Specify scrollbar width */
+}
+.fade-in-out {
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.right-side{
+  position:relative;
+  right: -123%;
+}

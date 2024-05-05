@@ -231,7 +231,7 @@ def signup_web():
     name = data.get('name')
     password = data.get('password')
     age = data.get('age')
-    supporting_team = data.get('supportingTeam')
+    supporting_team = data.get('team')
 
     message = signup(name, password, age, supporting_team)
 
@@ -242,7 +242,7 @@ def signup_web():
 def login_web():
     data = request.get_json()  # Get JSON data from the request body
     print("Received login data:", data)  # Log received data for debugging
-    name = data.get('username')
+    name = data.get('name')
     password = data.get('password')
 
     user = User.get(name)  # Retrieve user from the database
