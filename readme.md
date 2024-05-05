@@ -1,3 +1,13 @@
-Match predictor web application for guessing the exact scores for euro 2024 group stage football matches
+A desktop app for user prediction of exact scores and winners in the group stage of EURO 2024 football tournament in Germany.
 
-Sign up, predict the scores and see how you compare with others on the predictions leaderboard!
+Basics of the application
+
+- sign up system for a new user
+- match predictions by the user
+- storage of data and evaluation of user's points based on correct guesses
+- comparison with other users/players
+
+Build
+-SQL database
+-Python back-end
+-JavaScript front-end
