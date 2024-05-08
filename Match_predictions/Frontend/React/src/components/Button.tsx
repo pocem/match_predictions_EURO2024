@@ -1,4 +1,5 @@
 type Position = "static" | "relative" | "absolute" | "sticky" | "fixed";
+
 interface Props {
   children: string | JSX.Element;
   color: string;
@@ -6,6 +7,7 @@ interface Props {
   position?: Position;
   bottom?: string;
   left?: string;
+  type?: "button" | "submit" | "reset"; // Add type property
 }
 
 const Button = ({
@@ -15,6 +17,7 @@ const Button = ({
   position,
   bottom,
   left,
+  type = "button", // Set default value for type
 }: Props) => {
   const buttonStyle: React.CSSProperties = {
     position: position || "static",
@@ -24,6 +27,7 @@ const Button = ({
 
   return (
     <button
+      type={type} // Use type attribute
       className={"btn btn-" + color}
       onClick={onClick}
       style={buttonStyle}

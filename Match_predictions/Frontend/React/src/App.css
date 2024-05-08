@@ -22,6 +22,11 @@ transform: scale(1.1);
 .fly-in {
   animation: flyInAnimation 0.8s ease forwards;
 }
+.fly-in.minimized {
+  display: block;
+  max-height: 0;
+  overflow: hidden;
+}
 .date-cell {
   padding-left: 20px;
 }
@@ -60,9 +65,13 @@ transform: scale(1.1);
   color:whitesmoke
 }
 .list-group-scroll {
-  max-height: 500px; /* Set max height for scrollbar */
+  max-height: 800px; /* Set max height for scrollbar */
   overflow-y: auto; /* Enable vertical scrollbar */
   scrollbar-width: thin ; /* Specify scrollbar width */
+}
+.list-group-scroll.minimized {
+  max-height: 0; /* Hide the list group when minimized */
+  overflow-y: hidden; /* Hide the scrollbar when minimized */
 }
 .fade-in-out {
   animation: fadeInOut 3s ease-in-out;
@@ -85,4 +94,5 @@ transform: scale(1.1);
 .right-side{
   position:relative;
   right: -123%;
+  top: -200%;
 }

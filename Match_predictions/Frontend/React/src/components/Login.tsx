@@ -27,8 +27,16 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
     setPassword(e.target.value);
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    if (name === "") {
+      setUnsuccessfulMessage("Enter your name.");
+      return;
+    }
+
+    if (password === "") {
+      setUnsuccessfulMessage("Enter your password.");
+      return;
+    }
 
     const formData = {
       name: name,
@@ -63,6 +71,12 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
       // Handle error
     }
   };
+
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSubmit();
+  };
+
   function handleAnimationEnd(message: string) {
     // Remove the alert message immediately after the animation completes
     if (message === successMessage) {
@@ -90,13 +104,14 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
               {unsuccessfulMessage}
             </div>
           )}
+
           <div className="white-color-text right-side bg-success p1 rounded col-6">
             {loggedInUserName && <h3>Logged as '{loggedInUserName}'</h3>}
           </div>
         </div>
       </div>
       {!formSubmitted && (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <div className="container-md mt-5">
             <label>
               <input
@@ -120,7 +135,7 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
             <br />
             <Button
               color="btn btn-success btn-lg mt-3 button-hover"
-              onClick={handleLoginSuccess}
+              onClick={handleSubmit}
             >
               Login
             </Button>

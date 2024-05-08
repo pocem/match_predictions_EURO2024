@@ -58,47 +58,55 @@ function App() {
               </h2>
             </div>
           </div>
-
-          <div className="mt-4">
-            {" "}
-            {/* Add margin top */}
-            <Button color="success" onClick={handleSignUpButtonClick}>
-              Signup
-            </Button>
-            {showSignUpForm && <SignUpForm />}
-            <span className="ml-2"></span> {/* Add a small gap */}
-            <Button color="success" onClick={handleLoginButtonClick}>
-              Login
-            </Button>
-            {showLoginForm && (
-              <LoginForm onLoginSuccess={() => handleLoginSuccess()} />
-            )}
-          </div>
-
-          <div>
-            {!showLeaderboard ? (
-              <Button
-                color="success button-hover"
-                onClick={handleLeaderboard}
-                position="absolute"
-                bottom="550px"
-                left="76%"
-              >
-                Go to Leaderboard
+          {!isLoggedIn && (
+            <div className="mt-4">
+              {" "}
+              {/* Add margin top */}
+              <Button color="success" onClick={handleSignUpButtonClick}>
+                Signup
               </Button>
-            ) : (
-              <Leaderboard />
-            )}
-          </div>
-          <div>
-            {!showMatches ? (
-              <Button color="success button-hover mt-4" onClick={handleMatches}>
-                Show me the matches!
+              {showSignUpForm && <SignUpForm />}
+              <span className="ml-2"></span> {/* Add a small gap */}
+              <Button color="success" onClick={handleLoginButtonClick}>
+                Login
               </Button>
-            ) : (
-              <Matches />
-            )}
-          </div>
+              {showLoginForm && (
+                <LoginForm onLoginSuccess={() => handleLoginSuccess()} />
+              )}
+            </div>
+          )}
+
+          {isLoggedIn && (
+            <div>
+              {!showLeaderboard ? (
+                <Button
+                  color="success button-hover"
+                  onClick={handleLeaderboard}
+                  position="absolute"
+                  bottom="550px"
+                  left="76%"
+                >
+                  Go to Leaderboard
+                </Button>
+              ) : (
+                <Leaderboard />
+              )}
+            </div>
+          )}
+          {isLoggedIn && (
+            <div>
+              {!showMatches ? (
+                <Button
+                  color="success button-hover mt-4"
+                  onClick={handleMatches}
+                >
+                  Show me the matches!
+                </Button>
+              ) : (
+                <Matches />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

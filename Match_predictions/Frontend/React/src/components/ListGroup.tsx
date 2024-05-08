@@ -1,4 +1,5 @@
 import "../App.css";
+import { useState } from "react";
 
 function ParticipantsListGroup() {
   const countriesFbAssociations = {
@@ -28,12 +29,31 @@ function ParticipantsListGroup() {
     Ukraine: "https://en.uaf.ua/",
   };
 
+  const [isMinimized, setIsMinimized] = useState(false);
+
+  const toggleMinimized = () => {
+    setIsMinimized(!isMinimized);
+  };
+
   return (
     <>
       <div className="white-color-text">
-        <h2>Participants</h2>
+        <h2>
+          Participants{" "}
+          <button
+            className="btn btn-link btn-sm"
+            onClick={toggleMinimized}
+            aria-label={isMinimized ? "Maximize" : "Minimize"}
+          >
+            {isMinimized ? "▼" : "▲"}
+          </button>
+        </h2>
       </div>
-      <div className="list-group fly-in list-group-scroll">
+      <div
+        className={`list-group fly-in ${
+          isMinimized ? "minimized" : ""
+        } list-group-scroll `}
+      >
         {Object.entries(countriesFbAssociations).map(([country, website]) => (
           <a
             key={country}

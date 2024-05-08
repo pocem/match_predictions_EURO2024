@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import metaData from "../../matchdata.json";
 import Button from "./Button.tsx";
+import MatchRow from "./MatchRow.tsx";
 import "../App.css";
 
 // Define the type for each match
@@ -8,6 +9,8 @@ type Match = [string, string, string];
 
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
+  const [homeScores, setHomeScores] = useState<string[]>([]);
+  const [awayScores, setAwayScores] = useState<string[]>([]);
 
   // Parse match data from JSON file
   const matches: Match[] = metaData.matchesData.map(
@@ -20,6 +23,42 @@ const Matches: React.FC = () => {
     return matchDay === currentDay + 14; // Match the day numbering starting from 1
   });
 
+  const handleHomeScoreChange = (index: number, score: string) => {
+    const newHomeScores = [...homeScores];
+    newHomeScores[index] = score;
+    setHomeScores(newHomeScores);
+  };
+
+  const handleAwayScoreChange = (index: number, score: string) => {
+    const newAwayScores = [...awayScores];
+    newAwayScores[index] = score;
+    setAwayScores(newAwayScores);
+  };
+
+  const handleSubmit = async () => {
+    const formData = filteredMatches.map((_, index) => ({
+      homeScore: homeScores[index] || "",
+      awayScore: awayScores[index] || "",
+    }));
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/predictions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle error
+    }
+  };
+
   return (
     <div className="text-center">
       <table className="mx-auto table table-borderless">
@@ -30,7 +69,12 @@ const Matches: React.FC = () => {
         </thead>
         <tbody className="matches-body">
           {filteredMatches.map((match, index) => (
-            <MatchRow key={index} match={match} />
+            <MatchRow
+              key={index}
+              match={match}
+              onHomeScoreChange={(score) => handleHomeScoreChange(index, score)}
+              onAwayScoreChange={(score) => handleAwayScoreChange(index, score)}
+            />
           ))}
         </tbody>
       </table>
@@ -58,14 +102,12 @@ const Matches: React.FC = () => {
         </div>
         <div className="row mt-4">
           <div className="col-8 text-center">
-            {" "}
-            {/* Center the button using Bootstrap grid */}
             <Button
               color="success button-hover btn-lg"
               position="absolute"
               bottom="200px"
               left="46%"
-              onClick={() => setCurrentDay(currentDay)}
+              onClick={handleSubmit}
             >
               {"Submit Day " + (currentDay + 1)}
             </Button>
@@ -73,43 +115,6 @@ const Matches: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
-
-interface MatchRowProps {
-  match: Match;
-}
-
-const MatchRow: React.FC<MatchRowProps> = ({ match }) => {
-  const [homeTeam, awayTeam, date] = match;
-
-  return (
-    <tr>
-      <th scope="row" className="align-middle text-center">
-        {date}
-      </th>
-      <td className="align-middle text-center" style={{ width: "150px" }}>
-        {homeTeam}
-      </td>
-      <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control text-center"
-          style={{ width: "50px" }}
-        />
-      </td>
-      <td className="align-middle text-center">:</td>
-      <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control text-center"
-          style={{ width: "50px" }}
-        />
-      </td>
-      <td className="align-middle text-center" style={{ width: "150px" }}>
-        {awayTeam}
-      </td>
-    </tr>
   );
 };
 

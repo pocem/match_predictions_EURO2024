@@ -56,16 +56,21 @@ function SignUpForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (name === "") {
+      setUnsuccessfulMessage("Enter a name.");
+      return;
+    }
+
     if (password.length < 8) {
-      setUnsuccessfulMessage("Password must contain at least 8 characters");
+      setUnsuccessfulMessage("Password must contain at least 8 characters.");
       return;
     }
     if (age === "") {
-      setUnsuccessfulMessage("Enter valid age");
+      setUnsuccessfulMessage("Enter valid age.");
       return;
     }
     if (team === "") {
-      setUnsuccessfulMessage("Enter the team you support");
+      setUnsuccessfulMessage("Enter the team you support.");
       return;
     }
 
@@ -85,7 +90,10 @@ function SignUpForm() {
         body: JSON.stringify(formData),
       });
 
+      console.log("Response status:", response.status); // Add this line
+
       if (!response.ok) {
+        setUnsuccessfulMessage("Name already exists.");
         throw new Error("Network response was not ok");
       }
 
