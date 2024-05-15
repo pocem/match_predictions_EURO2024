@@ -9,8 +9,8 @@ type Match = [string, string, string];
 
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
-  const [homeScores, setHomeScores] = useState<string[]>([]);
-  const [awayScores, setAwayScores] = useState<string[]>([]);
+  const [homeScores, setHomeScores] = useState<number[]>([]); // Changed to number[]
+  const [awayScores, setAwayScores] = useState<number[]>([]); // Changed to number[]
 
   // Parse match data from JSON file
   const matches: Match[] = metaData.matchesData.map(
@@ -25,20 +25,20 @@ const Matches: React.FC = () => {
 
   const handleHomeScoreChange = (index: number, score: string) => {
     const newHomeScores = [...homeScores];
-    newHomeScores[index] = score;
+    newHomeScores[index] = parseInt(score); // Convert to number or set to 0 if NaN
     setHomeScores(newHomeScores);
   };
 
   const handleAwayScoreChange = (index: number, score: string) => {
     const newAwayScores = [...awayScores];
-    newAwayScores[index] = score;
+    newAwayScores[index] = parseInt(score); // Convert to number or set to 0 if NaN
     setAwayScores(newAwayScores);
   };
 
   const handleSubmit = async () => {
     const formData = filteredMatches.map((_, index) => ({
-      homeScore: homeScores[index] || "",
-      awayScore: awayScores[index] || "",
+      homeScore: homeScores[index], // Convert to number or set to 0 if NaN
+      awayScore: awayScores[index], // Convert to number or set to 0 if NaN
     }));
 
     try {
@@ -47,6 +47,8 @@ const Matches: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
+
         body: JSON.stringify(formData),
       });
 

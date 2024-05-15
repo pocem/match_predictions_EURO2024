@@ -1,10 +1,14 @@
 import mysql.connector
 from flask import Flask, request, session, jsonify, render_template
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
+from flask_session import Session
+
+
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
 
 
 mydb = mysql.connector.connect(host="localhost", user="root", passwd="grepolismiso21", database="euro")
@@ -12,10 +16,14 @@ mydb = mysql.connector.connect(host="localhost", user="root", passwd="grepolismi
 myCursor = mydb.cursor()
 app = Flask(__name__)
 with open('./.env', 'r') as file:
-    secret_key = file.read().strip()
+    SECRET_KEY = file.read().strip()
 
-app.secret_key = secret_key
+app.secret_key = SECRET_KEY
+SESSION_TYPE = "filesystem"
+app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
+app.config.from_object(__name__)
 login_manager = LoginManager(app)
+Session(app)
 CORS(app)
 
 # SIGNUP--------------------------------------------------
@@ -99,17 +107,29 @@ def get_matches():
     return myCursor.fetchall()
 
 player_predictions = []
-def get_predictions(name, data):
-    global player_predictions
+def get_predictions(data):
+    predictions = []
+
+    name = session["username"]
+
+    if not name:
+        print("No player name found in session")
+        return False
+    print(data)
     # Iterate over the prediction data and insert each prediction into the database
-    for match_id, scores in data.items():
-        home_score, away_score = scores  # Extract home and away scores from the tuple
+    for match_id in data:
+        home_score = data.get("homeScore", "")
+        away_score = data.get("awayScore", "")  # Extract home and away scores from the tuple
         insert_query = "INSERT INTO player_predictions (name, match_id, home_score, away_score) VALUES (%s, %s, %s, %s)"
         val = (name, match_id, home_score, away_score)
         myCursor.execute(insert_query, val)
 
-        player_predictions.append((match_id, home_score, away_score))
+        predictions.append((match_id, home_score, away_score))
     mydb.commit()
+
+    player_predictions.extend(predictions)
+
+    return True
 
 # TOP CHARTS ----------------------------------
 def top_charts():
@@ -239,6 +259,7 @@ def signup_web():
 
 # LOGIN POST to check if the user exists
 @app.route('/login', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def login_web():
     data = request.get_json()  # Get JSON data from the request body
     print("Received login data:", data)  # Log received data for debugging
@@ -250,7 +271,13 @@ def login_web():
     if user and user.password == password:
         # Login successful, authenticate the user and start session
         login_user(user)
-        return jsonify({"message": "Login successful"}), 200  # Send HTTP status code 200 (OK) for success
+        session["username"] = user.name
+        session.modified = True
+        print("User", session["username"], "logged in.")
+        print("Session name login:", name)
+
+
+        return jsonify({"message": "Login successful"}), 200,  # Send HTTP status code 200 (OK) for success
     else:
         return jsonify(
             {"message": "Incorrect username or password"}), 401  # Send HTTP status code 401 (Unauthorized) for failure
@@ -270,27 +297,27 @@ def logout():
     logout_user()
     return 'Logged out successfully'
 
-
-
-
-
-
-
-
 # POST sending user's predictions to backend
 @app.route('/predictions', methods=['POST'])
+@cross_origin(supports_credentials=True)
 def predictions():
     data = request.get_json()
 
-    name = session.get('player_name')
+    name = session.get('_user_id')
 
+    print("session name:", name)
     if name:
-        get_predictions(name, data)
-        print("Predictions saved.")
-        return jsonify({"message": "Predictions saved."})
+
+        success = get_predictions(data)
+        if success:
+            print("Predictions saved.")
+            return jsonify({"message": "Predictions saved."}),200
+        else:
+            print("No player name provided. No success")
+            return jsonify({"error": "No player name provided."}), 500
     else:
-        print("No player name provided.")
-        return jsonify({"error": "No player name provided."})
+        print("No player name provided in session")
+        return jsonify({"error": "No player name provided."}), 400
 
 # GET method for posting the players' leaderboard online
 @app.route('/leaderboard')
@@ -301,5 +328,6 @@ def get_top_charts():
 # Run the Flask application
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
