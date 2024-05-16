@@ -5,12 +5,14 @@ interface MatchRowProps {
   match: Match;
   onHomeScoreChange: (score: string) => void;
   onAwayScoreChange: (score: string) => void;
+  scoresSubmitted: boolean;
 }
 
 const MatchRow: React.FC<MatchRowProps> = ({
   match,
   onHomeScoreChange,
   onAwayScoreChange,
+  scoresSubmitted,
 }) => {
   const [homeTeam, awayTeam, date] = match;
 
@@ -23,25 +25,29 @@ const MatchRow: React.FC<MatchRowProps> = ({
         {homeTeam}
       </td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control text-center"
-          style={{ width: "50px" }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onHomeScoreChange(e.target.value)
-          }
-        />
+        {!scoresSubmitted && (
+          <input
+            type="text"
+            className="form-control text-center"
+            style={{ width: "50px" }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onHomeScoreChange(e.target.value)
+            }
+          />
+        )}
       </td>
       <td className="align-middle text-center">:</td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control text-center"
-          style={{ width: "50px" }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onAwayScoreChange(e.target.value)
-          }
-        />
+        {!scoresSubmitted && (
+          <input
+            type="text"
+            className="form-control text-center"
+            style={{ width: "50px" }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onAwayScoreChange(e.target.value)
+            }
+          />
+        )}
       </td>
       <td className="align-middle text-center" style={{ width: "150px" }}>
         {awayTeam}

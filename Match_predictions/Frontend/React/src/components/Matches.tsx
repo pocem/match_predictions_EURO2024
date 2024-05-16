@@ -6,12 +6,12 @@ import "../App.css";
 
 // Define the type for each match
 type Match = [string, string, string];
-
+let globalMatchId = 0;
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
   const [homeScores, setHomeScores] = useState<number[]>([]); // Changed to number[]
   const [awayScores, setAwayScores] = useState<number[]>([]); // Changed to number[]
-
+  const [scoresSubmitted, setScoresSubmitted] = useState<boolean>(false);
   // Parse match data from JSON file
   const matches: Match[] = metaData.matchesData.map(
     ([homeTeam, awayTeam, date]) => [homeTeam, awayTeam, date]
@@ -36,10 +36,31 @@ const Matches: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const formData = filteredMatches.map((_, index) => ({
-      homeScore: homeScores[index], // Convert to number or set to 0 if NaN
-      awayScore: awayScores[index], // Convert to number or set to 0 if NaN
-    }));
+    const submittedMatchIds: number[] = []; // Array to store submitted match IDs
+
+    const formData = filteredMatches
+      .map((_, index) => {
+        const match_id = ++globalMatchId; // Increment globalMatchId for each match
+        if (!submittedMatchIds.includes(match_id)) {
+          submittedMatchIds.push(match_id);
+          return {
+            match_id,
+            homeScore: homeScores[index] || 0,
+            awayScore: awayScores[index] || 0,
+          };
+        } else {
+          return null;
+        }
+      })
+      .filter(
+        (
+          formData
+        ): formData is {
+          match_id: number;
+          homeScore: number;
+          awayScore: number;
+        } => formData !== null
+      );
 
     try {
       const response = await fetch("http://127.0.0.1:5000/predictions", {
@@ -48,16 +69,15 @@ const Matches: React.FC = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
+      setScoresSubmitted(true);
     } catch (error) {
       console.error("Error:", error);
-      // Handle error
     }
   };
 
@@ -76,6 +96,7 @@ const Matches: React.FC = () => {
               match={match}
               onHomeScoreChange={(score) => handleHomeScoreChange(index, score)}
               onAwayScoreChange={(score) => handleAwayScoreChange(index, score)}
+              scoresSubmitted={scoresSubmitted}
             />
           ))}
         </tbody>
@@ -87,7 +108,9 @@ const Matches: React.FC = () => {
             position="absolute"
             bottom="440px"
             left="34%"
-            onClick={() => setCurrentDay(currentDay - 1)}
+            onClick={() => {
+              setCurrentDay(currentDay - 1);
+            }}
           >
             Last Day
           </Button>
@@ -97,7 +120,9 @@ const Matches: React.FC = () => {
             position="absolute"
             bottom="440px"
             left="61%"
-            onClick={() => setCurrentDay(currentDay + 1)}
+            onClick={() => {
+              setCurrentDay(currentDay + 1);
+            }}
           >
             Next Day
           </Button>
