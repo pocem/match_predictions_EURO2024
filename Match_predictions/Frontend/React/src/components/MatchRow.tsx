@@ -3,6 +3,8 @@ import React, { ChangeEvent } from "react";
 type Match = [string, string, string];
 interface MatchRowProps {
   match: Match;
+  homeScore: number;
+  awayScore: number;
   onHomeScoreChange: (score: string) => void;
   onAwayScoreChange: (score: string) => void;
   scoresSubmitted: boolean;
@@ -10,6 +12,8 @@ interface MatchRowProps {
 
 const MatchRow: React.FC<MatchRowProps> = ({
   match,
+  homeScore,
+  awayScore,
   onHomeScoreChange,
   onAwayScoreChange,
   scoresSubmitted,
@@ -25,7 +29,9 @@ const MatchRow: React.FC<MatchRowProps> = ({
         {homeTeam}
       </td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        {!scoresSubmitted && (
+        {scoresSubmitted ? (
+          <span>{homeScore}</span>
+        ) : (
           <input
             type="text"
             className="form-control text-center"
@@ -38,7 +44,9 @@ const MatchRow: React.FC<MatchRowProps> = ({
       </td>
       <td className="align-middle text-center">:</td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        {!scoresSubmitted && (
+        {scoresSubmitted ? (
+          <span>{awayScore}</span>
+        ) : (
           <input
             type="text"
             className="form-control text-center"

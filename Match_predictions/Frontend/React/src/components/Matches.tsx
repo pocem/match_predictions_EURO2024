@@ -4,63 +4,76 @@ import Button from "./Button.tsx";
 import MatchRow from "./MatchRow.tsx";
 import "../App.css";
 
-// Define the type for each match
 type Match = [string, string, string];
 let globalMatchId = 0;
+
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
-  const [homeScores, setHomeScores] = useState<number[]>([]); // Changed to number[]
-  const [awayScores, setAwayScores] = useState<number[]>([]); // Changed to number[]
+  const [homeScores, setHomeScores] = useState<number[]>([]);
+  const [awayScores, setAwayScores] = useState<number[]>([]);
   const [scoresSubmitted, setScoresSubmitted] = useState<boolean>(false);
-  // Parse match data from JSON file
+  const [successMessage, setSuccessMessage] = useState("");
+  const [unsuccessfulMessage, setUnsuccessfulMessage] = useState("");
+
   const matches: Match[] = metaData.matchesData.map(
     ([homeTeam, awayTeam, date]) => [homeTeam, awayTeam, date]
   );
 
-  // Filter matches for the current day
   const filteredMatches: Match[] = matches.filter((match: Match) => {
-    const matchDay = parseInt(match[2].split(",")[0]); // Extract the day from the match date
-    return matchDay === currentDay + 14; // Match the day numbering starting from 1
+    const matchDay = parseInt(match[2].split(",")[0]);
+    return matchDay === currentDay + 14;
   });
 
   const handleHomeScoreChange = (index: number, score: string) => {
     const newHomeScores = [...homeScores];
-    newHomeScores[index] = parseInt(score); // Convert to number or set to 0 if NaN
+    newHomeScores[index] = parseInt(score);
     setHomeScores(newHomeScores);
   };
 
   const handleAwayScoreChange = (index: number, score: string) => {
     const newAwayScores = [...awayScores];
-    newAwayScores[index] = parseInt(score); // Convert to number or set to 0 if NaN
+    newAwayScores[index] = parseInt(score);
     setAwayScores(newAwayScores);
   };
 
   const handleSubmit = async () => {
-    const submittedMatchIds: number[] = []; // Array to store submitted match IDs
+    const submittedMatchIds: number[] = [];
 
     const formData = filteredMatches
       .map((_, index) => {
-        const match_id = ++globalMatchId; // Increment globalMatchId for each match
+        const match_id = ++globalMatchId;
         if (!submittedMatchIds.includes(match_id)) {
           submittedMatchIds.push(match_id);
+          const homeScore = homeScores[index];
+          const awayScore = awayScores[index];
+
+          if (
+            homeScore === undefined ||
+            awayScore === undefined ||
+            isNaN(homeScore) ||
+            isNaN(awayScore)
+          ) {
+            setUnsuccessfulMessage(
+              "Please provide valid scores for all matches."
+            );
+            return null;
+          }
+
           return {
             match_id,
-            homeScore: homeScores[index] || 0,
-            awayScore: awayScores[index] || 0,
+            homeScore,
+            awayScore,
           };
         } else {
           return null;
         }
       })
-      .filter(
-        (
-          formData
-        ): formData is {
-          match_id: number;
-          homeScore: number;
-          awayScore: number;
-        } => formData !== null
-      );
+      .filter((formData) => formData !== null);
+
+    if (formData.length === 0) {
+      setUnsuccessfulMessage("Please provide valid scores for all matches.");
+      return;
+    }
 
     try {
       const response = await fetch("http://127.0.0.1:5000/predictions", {
@@ -73,12 +86,33 @@ const Matches: React.FC = () => {
       });
 
       if (!response.ok) {
+        setUnsuccessfulMessage("Predictions were not saved.");
         throw new Error("Network response was not ok");
       }
       setScoresSubmitted(true);
+      setSuccessMessage("Predictions saved.");
     } catch (error) {
       console.error("Error:", error);
     }
+  };
+
+  const handleNextDay = () => {
+    setCurrentDay(currentDay + 1);
+    setHomeScores([]);
+    setAwayScores([]);
+    setScoresSubmitted(false);
+  };
+
+  const handleLastDay = () => {
+    setCurrentDay(currentDay - 1);
+    setHomeScores([]);
+    setAwayScores([]);
+    setScoresSubmitted(false);
+  };
+
+  const handleAnimationEnd = () => {
+    setSuccessMessage("");
+    setUnsuccessfulMessage("");
   };
 
   return (
@@ -94,6 +128,8 @@ const Matches: React.FC = () => {
             <MatchRow
               key={index}
               match={match}
+              homeScore={homeScores[index]}
+              awayScore={awayScores[index]}
               onHomeScoreChange={(score) => handleHomeScoreChange(index, score)}
               onAwayScoreChange={(score) => handleAwayScoreChange(index, score)}
               scoresSubmitted={scoresSubmitted}
@@ -108,9 +144,7 @@ const Matches: React.FC = () => {
             position="absolute"
             bottom="440px"
             left="34%"
-            onClick={() => {
-              setCurrentDay(currentDay - 1);
-            }}
+            onClick={handleLastDay}
           >
             Last Day
           </Button>
@@ -120,14 +154,36 @@ const Matches: React.FC = () => {
             position="absolute"
             bottom="440px"
             left="61%"
-            onClick={() => {
-              setCurrentDay(currentDay + 1);
-            }}
+            onClick={handleNextDay}
           >
             Next Day
           </Button>
         </div>
-        <div className="row mt-4">
+        <div className="col-4 mx-auto matches-alert">
+          {successMessage && (
+            <div
+              className={`alert alert-success fade-in-out${
+                successMessage ? "" : "hidden"
+              }`}
+              role="alert"
+              onAnimationEnd={handleAnimationEnd}
+            >
+              {successMessage}
+            </div>
+          )}
+          {unsuccessfulMessage && (
+            <div
+              className={`alert alert-danger ${
+                unsuccessfulMessage ? "" : "hidden"
+              }`}
+              role="alert"
+              onAnimationEnd={handleAnimationEnd}
+            >
+              {unsuccessfulMessage}
+            </div>
+          )}
+        </div>
+        {!scoresSubmitted && (
           <div className="col-8 text-center">
             <Button
               color="success button-hover btn-lg"
@@ -139,7 +195,7 @@ const Matches: React.FC = () => {
               {"Submit Day " + (currentDay + 1)}
             </Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

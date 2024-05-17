@@ -74,25 +74,28 @@ transform: scale(1.1);
   overflow-y: hidden; /* Hide the scrollbar when minimized */
 }
 .fade-in-out {
-  animation: fadeInOut 3s ease-in-out;
+  animation: fadeInOut 4s ease-in-out;
+  
 }
 
 @keyframes fadeInOut {
   0% {
     opacity: 0;
   }
-  25% {
+  60% {
     opacity: 1;
   }
-  75% {
-    opacity: 1;
-  }
+  
   100% {
-    opacity: 0;
+    opacity: 1;
   }
 }
 .right-side{
   position:relative;
   right: -123%;
   top: -200%;
+}
+.matches-alert {
+  position: relative;
+  top: 400px;
 }
