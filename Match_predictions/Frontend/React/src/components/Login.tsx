@@ -1,5 +1,5 @@
+// LoginForm.tsx
 import { useState, ChangeEvent, FormEvent } from "react";
-import "../App.css";
 import Button from "./Button.tsx";
 
 interface LoginFormProps {
@@ -58,7 +58,7 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
         throw new Error("Network response was not ok");
       }
 
-      // Redirect to the next page after successful signup
+      // Redirect to the next page after successful login
       setSuccessMessage("Login successful");
       handleLoginSuccess();
 
@@ -78,14 +78,14 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
     handleSubmit();
   };
 
-  function handleAnimationEnd(message: string) {
+  const handleAnimationEnd = (message: string) => {
     // Remove the alert message immediately after the animation completes
     if (message === successMessage) {
       setSuccessMessage("");
     } else if (message === unsuccessfulMessage) {
       setUnsuccessfulMessage("");
     }
-  }
+  };
 
   return (
     <div className="container mt-5">
