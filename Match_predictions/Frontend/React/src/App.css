@@ -20,7 +20,7 @@ transform: scale(1.1);
 }
 
 .fly-in {
-  animation: flyInAnimation 0.8s ease forwards;
+  animation: flyInAnimation 1s ease forwards;
 }
 .fly-in.minimized {
   display: block;
@@ -98,4 +98,75 @@ transform: scale(1.1);
 .matches-alert {
   position: relative;
   top: 400px;
+}
+.pointer-cursor {
+  cursor: pointer;
+}
+.navbar-text {
+  margin-right: 20px;
+}
+
+
+.logged-user {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(255, 255, 255, 0.8); /* Optional: add a background color with some transparency */
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: "success";
+}
+.green-success {
+  color: #28a745;
+}
+.right-align {
+  margin-left: auto;
+}
+
+.fly-in-navbar {
+  display: none;
+}
+
+@keyframes flyInNavbarAnimation {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.fly-in-navbar {
+  animation: flyInNavbarAnimation 1.2s ease forwards;
+}
+.large-text {
+  font-size: 1.5rem;
+}
+.navbar-border {
+  border-radius: 10px;
+}
+
+.content-box {
+  background-color: #333; /* Background color for the box */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.fly-in-homePage {
+  display: none;
+}
+
+@keyframes flyInHomePageAnimation {
+  0% {
+    transform: translateY(+400%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.fly-in-homePage {
+  display: block;
+  animation: flyInHomePageAnimation 1.8s ease forwards;
 }

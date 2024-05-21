@@ -56,6 +56,10 @@ function SignUpForm() {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Clear previous messages
+    setUnsuccessfulMessage("");
+    setSuccessMessage("");
+
     if (name === "") {
       setUnsuccessfulMessage("Enter a name.");
       return;
@@ -93,7 +97,8 @@ function SignUpForm() {
       console.log("Response status:", response.status); // Add this line
 
       if (!response.ok) {
-        setUnsuccessfulMessage("Name already exists.");
+        const errorData = await response.json();
+        setUnsuccessfulMessage(errorData.error || "An error occurred.");
         throw new Error("Network response was not ok");
       }
 
