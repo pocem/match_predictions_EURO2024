@@ -9,6 +9,22 @@ const HomePage = () => {
         cup. See how you compare to the other football enthusiasts in the
         leaderboard!
       </p>
+      <br />
+      <p className="white-color-text left-align">
+        How your predictions are evaluated:
+        <br />
+        <b className="spacing">Correct score: 4 points</b>
+        <br />
+        <b className="spacing">
+          Guessed it's a draw but not the correct score: 2 points
+        </b>
+        <br />
+        <b className="spacing">
+          Guessed the winner of the match but not correct score: 1 point
+        </b>
+        <br />
+        <b className="spacing">Completely bottled it: 0 points</b>
+      </p>
     </div>
   );
 };

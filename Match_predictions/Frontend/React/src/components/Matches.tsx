@@ -117,7 +117,7 @@ const Matches: React.FC = () => {
 
   return (
     <div className="text-center">
-      <table className="mx-auto table table-borderless">
+      <table className="mx-auto table ">
         <thead>
           <tr>
             <th className="day-count">Day {currentDay + 1}</th>

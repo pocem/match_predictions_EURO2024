@@ -25,7 +25,10 @@ const MatchRow: React.FC<MatchRowProps> = ({
       <th scope="row" className="align-middle text-center">
         {date}
       </th>
-      <td className="align-middle text-center" style={{ width: "150px" }}>
+      <td
+        className="align-middle text-center team-name"
+        style={{ width: "150px" }}
+      >
         {homeTeam}
       </td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
@@ -34,8 +37,7 @@ const MatchRow: React.FC<MatchRowProps> = ({
         ) : (
           <input
             type="text"
-            className="form-control text-center"
-            style={{ width: "50px" }}
+            className="form-control score-input"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               onHomeScoreChange(e.target.value)
             }
@@ -49,15 +51,17 @@ const MatchRow: React.FC<MatchRowProps> = ({
         ) : (
           <input
             type="text"
-            className="form-control text-center"
-            style={{ width: "50px" }}
+            className="form-control score-input"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               onAwayScoreChange(e.target.value)
             }
           />
         )}
       </td>
-      <td className="align-middle text-center" style={{ width: "150px" }}>
+      <td
+        className="align-middle text-center team-name"
+        style={{ width: "150px" }}
+      >
         {awayTeam}
       </td>
     </tr>

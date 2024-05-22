@@ -50,7 +50,7 @@ const Ball: React.FC = () => {
   return (
     <img
       id="football"
-      src="../../ball.png"
+      src="src/images/ball.png"
       alt="Football"
       style={{ width: "50px", height: "50px" }}
     />

@@ -41,9 +41,10 @@ transform: scale(1.1);
   left: 50%;
   transform: translateX(-50%);
   font-size: large;
+  border-radius: 10px;
 }
 .main-body{
-  background-image: url('../../football bg.jpg');
+  background-image: url('images/football bg.jpg');
   height: 100vh;
 }
 
@@ -169,4 +170,69 @@ transform: scale(1.1);
 .fly-in-homePage {
   display: block;
   animation: flyInHomePageAnimation 1.8s ease forwards;
+}
+.euro-logo {
+  
+  width: 600px;
+  height: 369px;
+  border-radius: 10px;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  text-align: left;
+  border-radius: 10px;
+
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+
+}
+
+.table th {
+  background-color: #f4f4f4;
+}
+
+.table tr:nth-of-type(even) {
+  background-color: #f9f9f9;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.table .form-control {
+
+  padding: 5px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.table .text-center {
+  text-align: center;
+}
+
+.table .align-middle {
+  vertical-align: middle;
+}
+
+.table .team-name {
+  font-weight: bold;
+}
+
+.table .score-input {
+  width: 50px;
+  text-align: center;
+}
+.left-align {
+  text-align: left;
+  margin-top: 30px;
+}
+.spacing {
+  display: block;
+  margin-top: 15px;
 }

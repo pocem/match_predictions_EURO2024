@@ -119,6 +119,9 @@ function App() {
         </div>
         {isLoggedIn && <LoggedUser loggedInUserName={loggedInUserName} />}
       </div>
+      {!isLoggedIn && (
+        <img className="euro-logo mt-5" src="src/images/eurologo.jpg" />
+      )}
     </div>
   );
 }
