@@ -97,10 +97,16 @@ const Matches: React.FC = () => {
   };
 
   const handleNextDay = () => {
-    setCurrentDay(currentDay + 1);
-    setHomeScores([]);
-    setAwayScores([]);
-    setScoresSubmitted(false);
+    if (scoresSubmitted) {
+      setCurrentDay(currentDay + 1);
+      setHomeScores([]);
+      setAwayScores([]);
+      setScoresSubmitted(false);
+    } else {
+      setUnsuccessfulMessage(
+        "Please submit the scores for the current day first."
+      );
+    }
   };
 
   const handleLastDay = () => {
@@ -139,25 +145,30 @@ const Matches: React.FC = () => {
       </table>
       <div>
         <div className="d-flex justify-content-center">
-          <Button
-            color="success"
-            position="absolute"
-            bottom="440px"
-            left="34%"
-            onClick={handleLastDay}
-          >
-            Last Day
-          </Button>
+          {currentDay > 0 && (
+            <Button
+              color="success"
+              position="absolute"
+              bottom="440px"
+              left="34%"
+              onClick={handleLastDay}
+            >
+              Last Day
+            </Button>
+          )}
+
           <span className="mx-2"></span>
-          <Button
-            color="success"
-            position="absolute"
-            bottom="440px"
-            left="61%"
-            onClick={handleNextDay}
-          >
-            Next Day
-          </Button>
+          {currentDay < 12 && (
+            <Button
+              color="success"
+              position="absolute"
+              bottom="440px"
+              left="61%"
+              onClick={handleNextDay}
+            >
+              Next Day
+            </Button>
+          )}
         </div>
         <div className="col-4 mx-auto matches-alert">
           {successMessage && (
