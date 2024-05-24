@@ -38,7 +38,7 @@ const MatchRow: React.FC<MatchRowProps> = ({
           <input
             type="text"
             className="form-control score-input"
-            value={homeScore ? homeScore.toString() : ""}
+            value={homeScore !== undefined ? homeScore.toString() : ""}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               onHomeScoreChange(e.target.value)
             }
@@ -53,7 +53,7 @@ const MatchRow: React.FC<MatchRowProps> = ({
           <input
             type="text"
             className="form-control score-input"
-            value={awayScore ? awayScore.toString() : ""}
+            value={awayScore !== undefined ? awayScore.toString() : ""}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               onAwayScoreChange(e.target.value)
             }

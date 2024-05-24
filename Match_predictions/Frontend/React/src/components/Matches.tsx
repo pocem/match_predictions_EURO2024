@@ -9,9 +9,13 @@ let globalMatchId = 0;
 
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
-  const [homeScores, setHomeScores] = useState<number[]>([]);
-  const [awayScores, setAwayScores] = useState<number[]>([]);
-  const [scoresSubmitted, setScoresSubmitted] = useState<boolean>(false);
+  const [allScores, setAllScores] = useState<{
+    [day: number]: {
+      homeScores: number[];
+      awayScores: number[];
+      submitted: boolean;
+    };
+  }>({});
   const [successMessage, setSuccessMessage] = useState("");
   const [unsuccessfulMessage, setUnsuccessfulMessage] = useState("");
 
@@ -25,18 +29,33 @@ const Matches: React.FC = () => {
   });
 
   const handleHomeScoreChange = (index: number, score: string) => {
-    const newHomeScores = [...homeScores];
-    newHomeScores[index] = parseInt(score);
-    setHomeScores(newHomeScores);
+    const newScores = { ...allScores };
+    newScores[currentDay] = newScores[currentDay] || {
+      homeScores: [],
+      awayScores: [],
+      submitted: false,
+    };
+    newScores[currentDay].homeScores[index] = parseInt(score);
+    setAllScores(newScores);
   };
 
   const handleAwayScoreChange = (index: number, score: string) => {
-    const newAwayScores = [...awayScores];
-    newAwayScores[index] = parseInt(score);
-    setAwayScores(newAwayScores);
+    const newScores = { ...allScores };
+    newScores[currentDay] = newScores[currentDay] || {
+      homeScores: [],
+      awayScores: [],
+      submitted: false,
+    };
+    newScores[currentDay].awayScores[index] = parseInt(score);
+    setAllScores(newScores);
   };
 
   const handleSubmit = async () => {
+    const currentScores = allScores[currentDay] || {
+      homeScores: [],
+      awayScores: [],
+      submitted: false,
+    };
     const submittedMatchIds: number[] = [];
 
     const formData = filteredMatches
@@ -44,8 +63,8 @@ const Matches: React.FC = () => {
         const match_id = ++globalMatchId;
         if (!submittedMatchIds.includes(match_id)) {
           submittedMatchIds.push(match_id);
-          const homeScore = homeScores[index];
-          const awayScore = awayScores[index];
+          const homeScore = currentScores.homeScores[index];
+          const awayScore = currentScores.awayScores[index];
 
           if (
             homeScore === undefined ||
@@ -89,7 +108,9 @@ const Matches: React.FC = () => {
         setUnsuccessfulMessage("Predictions were not saved.");
         throw new Error("Network response was not ok");
       }
-      setScoresSubmitted(true);
+      const newScores = { ...allScores };
+      newScores[currentDay] = { ...currentScores, submitted: true };
+      setAllScores(newScores);
       setSuccessMessage("Predictions saved.");
     } catch (error) {
       console.error("Error:", error);
@@ -97,11 +118,8 @@ const Matches: React.FC = () => {
   };
 
   const handleNextDay = () => {
-    if (scoresSubmitted) {
+    if (allScores[currentDay]?.submitted) {
       setCurrentDay(currentDay + 1);
-      setHomeScores([]);
-      setAwayScores([]);
-      setScoresSubmitted(false);
     } else {
       setUnsuccessfulMessage(
         "Please submit the scores for the current day first."
@@ -111,14 +129,17 @@ const Matches: React.FC = () => {
 
   const handleLastDay = () => {
     setCurrentDay(currentDay - 1);
-    setHomeScores([]);
-    setAwayScores([]);
-    setScoresSubmitted(false);
   };
 
   const handleAnimationEnd = () => {
     setSuccessMessage("");
     setUnsuccessfulMessage("");
+  };
+
+  const currentScores = allScores[currentDay] || {
+    homeScores: [],
+    awayScores: [],
+    submitted: false,
   };
 
   return (
@@ -134,11 +155,11 @@ const Matches: React.FC = () => {
             <MatchRow
               key={index}
               match={match}
-              homeScore={homeScores[index]}
-              awayScore={awayScores[index]}
+              homeScore={currentScores.homeScores[index]}
+              awayScore={currentScores.awayScores[index]}
               onHomeScoreChange={(score) => handleHomeScoreChange(index, score)}
               onAwayScoreChange={(score) => handleAwayScoreChange(index, score)}
-              scoresSubmitted={scoresSubmitted}
+              scoresSubmitted={currentScores.submitted}
             />
           ))}
         </tbody>
@@ -194,7 +215,7 @@ const Matches: React.FC = () => {
             </div>
           )}
         </div>
-        {!scoresSubmitted && (
+        {!currentScores.submitted && (
           <div className="col-8 text-center">
             <Button
               color="success button-hover btn-lg"
