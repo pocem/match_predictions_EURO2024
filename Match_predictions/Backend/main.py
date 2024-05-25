@@ -24,7 +24,7 @@ app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 app.config.from_object(__name__)
 login_manager = LoginManager(app)
 Session(app)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 # SIGNUP--------------------------------------------------
 def signup(name, password, age, supportingTeam):
@@ -35,16 +35,25 @@ def signup(name, password, age, supportingTeam):
 
     if existing_name is not None:
         print("Name already exists in the database.")
-        return {"error": "Name already exists"}
+        return {"error": "Name already exists"}, 400
 
-    # Insert the signup credentials into the database
-    insert_query = "INSERT INTO player (name, password_, age, supporting) VALUES (%s, %s, %s, %s)"
-    val = (name, password, age, supportingTeam)
-    myCursor.execute(insert_query, val)
+    # Insert the signup credentials into the player table
+    insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
+    val = (name, password)
+    myCursor.execute(insert_player_query, val)
+    mydb.commit()
+
+    # Insert the player into the top_charts table with 0 points
+    insert_top_charts_query = "INSERT INTO top_charts (name, age, supporting, points) VALUES (%s, %s, %s, %s)"
+    val = (name, age, supportingTeam, 0)
+    myCursor.execute(insert_top_charts_query, val)
     mydb.commit()
 
     print("Signup successful!")
-    return {"message": "Signup successful"}
+    return {"message": "Signup successful"}, 200
+
+
+
 
 # LOGIN---------------------------------------------
 def login(name, password):
@@ -76,11 +85,11 @@ def login(name, password):
 # storing all info about the player in a dictionary
 player_credentials = {}
 
-myCursor.execute("SELECT name, password_, age, supporting FROM player")
+myCursor.execute("SELECT name, password_ FROM player")
 signup_data = myCursor.fetchall()
 
-for name, password, age, supporting_team in signup_data:
-    player_credentials[name] = {'password': password, 'age': age, 'supporting_team': supporting_team}
+for name, password in signup_data:
+    player_credentials[name] = {'password': password}
 
 class User(UserMixin):
     def __init__(self, name, password):
@@ -110,48 +119,77 @@ player_predictions = []
 def get_predictions(data):
     predictions = []
 
-    name = session["username"]
-
+    name = session.get("username")
     if not name:
         print("No player name found in session")
         return False
+
+    print("Session name:", name)
     print(data)
+
     # Iterate over the prediction data and insert each prediction into the database
-    for match_id in data:
-        home_score = data.get("homeScore", "")
-        away_score = data.get("awayScore", "")  # Extract home and away scores from the tuple
-        insert_query = "INSERT INTO player_predictions (name, match_id, home_score, away_score) VALUES (%s, %s, %s, %s)"
-        val = (name, match_id, home_score, away_score)
-        myCursor.execute(insert_query, val)
+    for match in data:
+        match_id = match.get("match_id")
+        home_score = match.get("homeScore")
+        away_score = match.get("awayScore")
 
-        predictions.append((match_id, home_score, away_score))
+        if match_id is None or home_score is None or away_score is None:
+            print("Incomplete match data:", match)
+            continue
+
+        try:
+            insert_query = "INSERT INTO player_predictions (name, match_id, home_score, away_score) VALUES (%s, %s, %s, %s)"
+            val = (name, match_id, home_score, away_score)
+
+            myCursor.execute(insert_query, val)
+
+            predictions.append((match_id, home_score, away_score))
+        except Exception as e:
+            print("Error inserting prediction:", e)
+            continue
+
     mydb.commit()
-
     player_predictions.extend(predictions)
 
     return True
 
+
 # TOP CHARTS ----------------------------------
 def top_charts():
+    # Fetch player credentials to include age and supporting_team from top_charts
+    myCursor.execute("SELECT name, age, supporting, points FROM top_charts")
+    players = myCursor.fetchall()
+
+    player_credentials = {}
+    for name, age, supporting_team, points in players:
+        player_credentials[name] = {
+            'age': age,
+            'supporting_team': supporting_team,
+            'points': points
+        }
+
     # Sort players by points (descending order)
-    sorted_players = sorted(player_credentials.items(), key=lambda x: x[1]['points'], reverse=True)
+    sorted_players = sorted(player_credentials.items(), key=lambda x: x[1].get('points', 0), reverse=True)
 
     # List to store top players data
     top_players_data = []
 
-    # Assign ranks and insert into database
+    # Assign ranks and update the database
     rank = 1
     for name, player_data in sorted_players:
-        # Copy player data without the 'password' key
-        player_info = {k: v for k, v in player_data.items() if k != 'password'}
-
         # Add rank to player info
-        player_info['rank'] = rank
+        player_info = {k: v for k, v in player_data.items()}
+        player_info['rank_'] = rank
 
-        # Insert player information into the database
-        insert_query = "INSERT INTO top_charts (name, age, supporting, points, rank) VALUES (%s, %s, %s, %s, %s)"
-        val = (rank, name, player_data['age'], player_data['supporting_team'], player_data['points'])
-        myCursor.execute(insert_query, val)
+        # Update player information in the database
+        update_query = """
+            
+            UPDATE top_charts 
+            SET rank_ = %s
+            WHERE name = %s
+        """
+        val = (rank, name)
+        myCursor.execute(update_query, val)
         mydb.commit()
 
         # Append player information to top players data list
@@ -162,6 +200,32 @@ def top_charts():
 
     # Return the top players data
     return top_players_data
+
+
+
+
+def get_top_charts_data():
+    try:
+        myCursor.execute("SELECT rank_, name, age, supporting, points FROM top_charts ORDER BY rank_ ASC")
+        result = myCursor.fetchall()
+        top_charts_data = []
+
+        for row in result:
+            rank_, name, age, supporting, points = row
+            top_charts_data.append({
+                "rank": rank_,
+                "name": name,
+                "age": age,
+                "supporting_team": supporting,
+                "points": points
+            })
+
+        return top_charts_data
+    except Exception as e:
+        print("An error occurred while querying the top_charts database:", e)
+        return []
+
+
 
 # check the predictions with real outcomes --- WEBSCRAPING/API
 # while True:
@@ -253,9 +317,12 @@ def signup_web():
     age = data.get('age')
     supporting_team = data.get('team')
 
-    message = signup(name, password, age, supporting_team)
+    message,status_code = signup(name, password, age, supporting_team)
 
-    return jsonify({"message": message})
+    if 'error' in message:
+        return jsonify(message), status_code
+    else:
+        return jsonify(message), 200
 
 # LOGIN POST to check if the user exists
 @app.route('/login', methods=['POST'])
@@ -321,13 +388,11 @@ def predictions():
 
 # GET method for posting the players' leaderboard online
 @app.route('/leaderboard')
+@cross_origin(supports_credentials=True)
 def get_top_charts():
-    top_players_data = top_charts()
-    return jsonify(top_players_data)
+
+    return jsonify(get_top_charts_data())
 
 # Run the Flask application
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
