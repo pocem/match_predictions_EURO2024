@@ -43,11 +43,11 @@ function Leaderboard() {
       <tbody>
         {leaderboardData.map((entry, index) => (
           <tr key={index}>
-            <td>{entry[0]}</td>
-            <td>{entry[1]}</td>
-            <td>{entry[2]}</td>
-            <td>{entry[3]}</td>
-            <td>{entry[4]}</td>
+            <td>{entry.rank}</td>
+            <td>{entry.name}</td>
+            <td>{entry.points}</td>
+            <td>{entry.age}</td>
+            <td>{entry.supporting_team}</td>
           </tr>
         ))}
       </tbody>
