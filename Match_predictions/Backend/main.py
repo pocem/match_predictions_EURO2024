@@ -4,6 +4,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 
+from itertools import islice
+
 
 import time
 from selenium import webdriver
@@ -112,7 +114,7 @@ class User(UserMixin):
 
 # Function to retrieve matches from the database
 def get_matches():
-    myCursor.execute("SELECT home_team, away_team, match_date FROM match_predictions")
+    myCursor.execute("SELECT match_id, home_team_score, away_team_score FROM match_predictions")
     return myCursor.fetchall()
 
 player_predictions = []
@@ -127,16 +129,24 @@ def get_predictions(data):
     print("Session name:", name)
     print(data)
 
+    # Get the current maximum match_id for this player
+    myCursor.execute("SELECT MAX(match_id) FROM player_predictions WHERE name = %s", (name,))
+    max_match_id = myCursor.fetchone()[0] or 0
+
+    # Set initial match_id for the player
+    match_id = max_match_id + 1
+
     # Iterate over the prediction data and insert each prediction into the database
     for match in data:
-        match_id = match.get("match_id")
         home_score = match.get("homeScore")
         away_score = match.get("awayScore")
 
-        if match_id is None or home_score is None or away_score is None:
+        if home_score is None or away_score is None:
             print("Incomplete match data:", match)
             continue
 
+        # Ensure the scores are numeric
+       
         try:
             insert_query = "INSERT INTO player_predictions (name, match_id, home_score, away_score) VALUES (%s, %s, %s, %s)"
             val = (name, match_id, home_score, away_score)
@@ -144,6 +154,7 @@ def get_predictions(data):
             myCursor.execute(insert_query, val)
 
             predictions.append((match_id, home_score, away_score))
+            match_id += 1  # Increment match_id for the next prediction
         except Exception as e:
             print("Error inserting prediction:", e)
             continue
@@ -151,7 +162,9 @@ def get_predictions(data):
     mydb.commit()
     player_predictions.extend(predictions)
 
-    return True
+
+    return player_predictions
+
 
 
 # TOP CHARTS ----------------------------------
@@ -228,63 +241,72 @@ def get_top_charts_data():
 
 
 # check the predictions with real outcomes --- WEBSCRAPING/API
-# while True:
-#     try:
-#         driver = webdriver.Chrome()
-#         # Open the website
-#         driver.get("https://www.flashscore.com/football/europe/euro/fixtures/")
-#
-#         # Find all div elements where the home scores are stored
-#         score_home_elements = driver.find_elements(By.CLASS_NAME, "event__score--home")
-#         # Find all div elements where the away scores are stored
-#         score_away_elements = driver.find_elements(By.CLASS_NAME, "event__score--away")
-#
-#         # Initialize empty list to store match data
-#         match_data = []
-#
-#         # Loop through the matches and extract the scores
-#         for index, (score_home_element, score_away_element) in enumerate(zip(score_home_elements, score_away_elements), start=1):
-#             score_home = score_home_element.text
-#             score_away = score_away_element.text
-#             match_data.append((index, score_home, score_away))
-#
-#         # Insert the scraped data into the database
-#         insert_query = "INSERT INTO match_predictions (match_id, home_team_score, away_team_score) VALUES (%s, %s, %s)"
-#         myCursor.executemany(insert_query, match_data)
-#         mydb.commit()
-#
-#         # Output the success message
-#         print("Scraped data inserted into database successfully.")
-#
-#         # Check if all matches have started
-#         if all(score != "-" for _, score, _ in match_data):
-#             # Evaluate points for the last match
-#             matches = get_matches()
-#             points = 0
-#             for match_id, index in range(len(matches)):
-#                 match_id, home_prediction, away_prediction = player_predictions[match_id]
-#                 index, real_score_home, real_score_away = match_data[index]
-#
-#                 if home_prediction == real_score_home and away_prediction == real_score_away:
-#                     points += 4
-#                 elif home_prediction > away_prediction and real_score_home > real_score_away:
-#                     points += 1
-#                 elif home_prediction < away_prediction and real_score_home < real_score_away:
-#                     points += 1
-#                 elif home_prediction == away_prediction and real_score_home == real_score_away:
-#                     points += 2
-#             break  # Exit the loop if all matches have started
-#
-#     except Exception as e:
-#         # Handle any exceptions gracefully
-#         print("An error occurred:", str(e))
-#
-#     finally:
-#         # Close the WebDriver to free up resources
-#         driver.quit()
-#
-#     # Wait for 1 hour (3600 seconds) before the next update
-#     time.sleep(3600)
+def fetch_match_results():
+    try:
+        driver = webdriver.Chrome()
+        driver.get("https://www.flashscore.com/football/uzbekistan/pro-liga/#/l00sNjki/table/overall")
+        score_home_elements = driver.find_elements(By.CLASS_NAME, "event__score--home")
+        score_away_elements = driver.find_elements(By.CLASS_NAME, "event__score--away")
+        match_data = []
+
+        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 4), start=1):
+            home_score = home_element.text
+            away_score = away_element.text
+
+            if not home_score.isdigit() or not away_score.isdigit():
+                continue
+
+            match_data.append((index, int(home_score), int(away_score)))  # Convert scores to integers
+
+        driver.quit()
+        print("Fetched matchdata: ", match_data)
+        return match_data
+    except Exception as e:
+        if 'driver' in locals():
+            driver.quit()
+        print(f"Error fetching match results: {e}")
+        return []
+
+def periodic_fetch():
+    while True:
+        match_data = fetch_match_results()
+
+        if match_data:
+            print("matchdata: ",match_data)
+            insert_query = "UPDATE match_predictions SET home_team_score = %s, away_team_score = %s WHERE match_id = %s"
+
+            try:
+                myCursor.executemany(insert_query,[(home_score, away_score, match_id) for match_id, home_score, away_score in match_data])
+                mydb.commit()
+            except Exception as e:
+                print("Error inserting match dataaa:", e)
+
+            if all(isinstance(home_score, int) and isinstance(away_score, int) for _, home_score, away_score in match_data):
+                evaluate_predictions(match_data)
+                break
+
+        time.sleep(3600)
+
+
+
+# FUNCTION TO EVALUATE PREDICTIONS
+def evaluate_predictions(match_data):
+    matches = get_matches()
+    points = 0
+
+    for match_id, index in enumerate(range(len(matches))):
+        home_prediction, away_prediction = player_predictions[match_id][1:2]
+        real_score_home, real_score_away = match_data[index][1:2]
+
+
+        if home_prediction == real_score_home and away_prediction == real_score_away:
+            points += 4
+        elif home_prediction > away_prediction and real_score_home > real_score_away:
+            points += 1
+        elif home_prediction < away_prediction and real_score_home < real_score_away:
+            points += 1
+        elif home_prediction == away_prediction and real_score_home == real_score_away:
+            points += 2
 
 # showing the live match results--------------------------
 def match_results_shown():
@@ -311,7 +333,7 @@ def matches():
 def signup_web():
     data = request.get_json()  # Get JSON data from the request body
     # Access individual fields from the JSON data
-    print("Received login data:", data)
+    print("Received signup data:", data)
     name = data.get('name')
     password = data.get('password')
     age = data.get('age')
@@ -319,10 +341,9 @@ def signup_web():
 
     message,status_code = signup(name, password, age, supporting_team)
 
-    if 'error' in message:
-        return jsonify(message), status_code
-    else:
-        return jsonify(message), 200
+
+    return jsonify(message), status_code
+
 
 # LOGIN POST to check if the user exists
 @app.route('/login', methods=['POST'])
@@ -395,4 +416,5 @@ def get_top_charts():
 
 # Run the Flask application
 if __name__ == '__main__':
+    periodic_fetch()
     app.run(debug=True)
