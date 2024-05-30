@@ -4,7 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 import threading
-import time
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from itertools import islice
@@ -210,12 +210,13 @@ def get_top_charts_data():
 def fetch_match_results():
     try:
         driver = webdriver.Chrome()
-        driver.get("https://www.flashscore.com/football/uzbekistan/pro-liga/#/l00sNjki/table/overall")
+        driver.get("https://www.flashscore.com/football/south-america/copa-sudamericana/#/QXNGy9Xc/table/overall")
         score_home_elements = driver.find_elements(By.CLASS_NAME, "event__score--home")
         score_away_elements = driver.find_elements(By.CLASS_NAME, "event__score--away")
+
         match_data = []
 
-        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 4), start=1):
+        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 3), start=1):
             home_score = home_element.text
             away_score = away_element.text
 
@@ -247,46 +248,76 @@ def periodic_fetch():
             print("Error inserting match data:", e)
 
     evaluate_predictions(match_data)
-
-
-
     # Sleep for an hour before fetching again
-    time.sleep(3600)
+
 
 
 #UPDATING TOP CHART TABLE WITH POINTS FOR EACH PLAYER BASED ON THEIR PREDICTION ACCURACY
 def evaluate_predictions(match_data):
-    points = 0
-
-    #sql query for
-    myCursor.execute("SELECT *  FROM player_predictions ")
-    result = myCursor.fetchall()
-    print(result)
-
-
-
-    for match_id, match in enumerate(match_data):
-        home_prediction, away_prediction = player_predictions[match_id][1:3]
-        real_score_home, real_score_away = match[1:3]
-
-        if home_prediction == real_score_home and away_prediction == real_score_away:
-            points += 4
-        elif home_prediction > away_prediction and real_score_home > real_score_away:
-            points += 1
-        elif home_prediction < away_prediction and real_score_home < real_score_away:
-            points += 1
-        elif home_prediction == away_prediction and real_score_home == real_score_away:
-            points += 2
-
-    # Update the points in the top_charts table for the current user
     try:
-        update_query = "UPDATE top_charts SET points = %s WHERE name = %s"
-        myCursor.execute(update_query, (points, ))
-        mydb.commit()
-        print(f"Total points for : {points}")
-    except Exception as e:
-        print(f"Error updating points for : {e}")
+        # Fetch player predictions from the database
+        myCursor.execute("SELECT * FROM player_predictions")
+        result = myCursor.fetchall()
+        print(result)
 
+        # Organize player predictions by player and match_id
+        player_predictions = {}
+        for row in result:
+            player, match_id, home_prediction, away_prediction = row
+            if player not in player_predictions:
+                player_predictions[player] = {}
+            player_predictions[player][match_id] = (home_prediction, away_prediction)
+
+        # Initialize a dictionary to store points for each player
+        player_points = {player: 0 for player in player_predictions}
+
+        # Compare match data with player predictions and calculate points
+        for match in match_data:
+            match_id, real_score_home, real_score_away = match
+
+            for player, predictions in player_predictions.items():
+                if match_id in predictions:
+                    home_prediction, away_prediction = predictions[match_id]
+
+                    if home_prediction == real_score_home and away_prediction == real_score_away:
+                        player_points[player] += 4
+                    elif home_prediction > away_prediction and real_score_home > real_score_away:
+                        player_points[player] += 1
+                    elif home_prediction < away_prediction and real_score_home < real_score_away:
+                        player_points[player] += 1
+                    elif home_prediction == away_prediction and real_score_home == real_score_away:
+                        player_points[player] += 2
+
+        # Update the points in the top_charts table for each player
+        for player, points in player_points.items():
+            try:
+                update_query = "UPDATE top_charts SET points = %s WHERE name = %s"
+                myCursor.execute(update_query, (points, player))
+                mydb.commit()
+                print(f"Total points for {player}: {points}")
+            except Exception as e:
+                print(f"Error updating points for {player}: {e}")
+
+        # Fetch and sort the top charts data
+        try:
+            fetch_sorted_query = "SELECT name, points FROM top_charts ORDER BY points DESC"
+            myCursor.execute(fetch_sorted_query)
+            sorted_results = myCursor.fetchall()
+            print("Sorted top charts data:", sorted_results)
+
+            # Optionally update the rank_ in the database
+            for rank, (player, points) in enumerate(sorted_results, start=1):
+                try:
+                    update_rank_query = "UPDATE top_charts SET rank_ = %s WHERE name = %s"
+                    myCursor.execute(update_rank_query, (rank, player))
+                    mydb.commit()
+                except Exception as e:
+                    print(f"Error updating rank for {player}: {e}")
+        except Exception as e:
+            print(f"Error fetching sorted top charts data: {e}")
+
+    except Exception as e:
+        print(f"Error evaluating predictions: {e}")
 def match_results_shown():
     myCursor.execute("SELECT match_id, home_team_score, away_team_score FROM match_predictions")
     latest_match_data = myCursor.fetchall()
@@ -379,6 +410,6 @@ def get_top_charts():
     return jsonify(get_top_charts_data())
 
 if __name__ == '__main__':
-    periodic_fetch()
+    # periodic_fetch()
 
-    # app.run(debug=True)
+    app.run(debug=True)
