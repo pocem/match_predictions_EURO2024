@@ -5,6 +5,7 @@ interface Match {
   homeTeam: string;
   awayTeam: string;
   date: string;
+  time: string;
 }
 
 interface MatchRowProps {
@@ -14,6 +15,7 @@ interface MatchRowProps {
   onHomeScoreChange: (score: string) => void;
   onAwayScoreChange: (score: string) => void;
   scoresSubmitted: boolean;
+  time: string;
 }
 
 const MatchRow: React.FC<MatchRowProps> = ({
@@ -24,13 +26,14 @@ const MatchRow: React.FC<MatchRowProps> = ({
   onAwayScoreChange,
   scoresSubmitted,
 }) => {
-  const { homeTeam, awayTeam, date } = match;
+  const { homeTeam, awayTeam, date, time } = match;
 
   return (
     <tr>
       <th scope="row" className="align-middle text-center">
         {date}
       </th>
+      <td className="align-middle text-center">{time}</td>
       <td
         className="align-middle text-center team-name"
         style={{ width: "150px" }}

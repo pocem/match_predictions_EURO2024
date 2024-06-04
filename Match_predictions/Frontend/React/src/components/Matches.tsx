@@ -10,6 +10,7 @@ type Match = {
   homeTeam: string;
   awayTeam: string;
   date: string;
+  time: string;
 };
 
 const Matches: React.FC = () => {
@@ -26,11 +27,12 @@ const Matches: React.FC = () => {
 
   // Transform matches data to the correct Match type with match_id
   const matches: Match[] = metaData.matchesData.map(
-    ([homeTeam, awayTeam, date], index) => ({
+    ([homeTeam, awayTeam, date, time], index) => ({
       match_id: index + 1, // Assign a unique ID
       homeTeam,
       awayTeam,
       date,
+      time,
     })
   );
 
@@ -231,6 +233,7 @@ const Matches: React.FC = () => {
                 handleAwayScoreChange(match.match_id, score)
               }
               scoresSubmitted={currentScores.submitted}
+              time={match.time}
             />
           ))}
         </tbody>
@@ -241,7 +244,7 @@ const Matches: React.FC = () => {
             <Button
               color="success"
               position="absolute"
-              bottom="440px"
+              bottom="400px"
               left="34%"
               onClick={handleLastDay}
             >
@@ -253,7 +256,7 @@ const Matches: React.FC = () => {
             <Button
               color="success"
               position="absolute"
-              bottom="440px"
+              bottom="400px"
               left="61%"
               onClick={handleNextDay}
             >
