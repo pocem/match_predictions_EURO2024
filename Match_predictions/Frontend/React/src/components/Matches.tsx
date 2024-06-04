@@ -1,70 +1,143 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import metaData from "../../matchdata.json";
-import Button from "./Button.tsx";
-import MatchRow from "./MatchRow.tsx";
+import Button from "./Button";
+import MatchRow from "./MatchRow";
 import "../App.css";
 
-type Match = [string, string, string];
-let globalMatchId = 0;
+// Define Match type as an object with match_id
+type Match = {
+  match_id: number;
+  homeTeam: string;
+  awayTeam: string;
+  date: string;
+};
 
 const Matches: React.FC = () => {
   const [currentDay, setCurrentDay] = useState(0);
-  const [allScores, setAllScores] = useState<{
-    [day: number]: {
-      homeScores: number[];
-      awayScores: number[];
-      submitted: boolean;
-    };
-  }>({});
+  const [allScores, setAllScores] = useState<{ [day: number]: DayScores }>({});
   const [successMessage, setSuccessMessage] = useState("");
   const [unsuccessfulMessage, setUnsuccessfulMessage] = useState("");
 
+  interface DayScores {
+    homeScores: { [matchId: number]: number };
+    awayScores: { [matchId: number]: number };
+    submitted: boolean;
+  }
+
+  // Transform matches data to the correct Match type with match_id
   const matches: Match[] = metaData.matchesData.map(
-    ([homeTeam, awayTeam, date]) => [homeTeam, awayTeam, date]
+    ([homeTeam, awayTeam, date], index) => ({
+      match_id: index + 1, // Assign a unique ID
+      homeTeam,
+      awayTeam,
+      date,
+    })
   );
 
+  // Filter matches based on the current day
   const filteredMatches: Match[] = matches.filter((match: Match) => {
-    const matchDay = parseInt(match[2].split(",")[0]);
+    const matchDay = parseInt(match.date.split(",")[0]);
     return matchDay === currentDay + 14;
   });
 
-  const handleHomeScoreChange = (index: number, score: string) => {
+  useEffect(() => {
+    const fetchSavedPredictions = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/predictions", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          setUnsuccessfulMessage("Failed to fetch saved predictions.");
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        console.log("fetched saved predictions:", data);
+
+        const newAllScores: { [day: number]: DayScores } = {};
+
+        data.forEach(
+          (prediction: {
+            match_id: number;
+            home_score: number;
+            away_score: number;
+          }) => {
+            const { match_id, home_score, away_score } = prediction;
+
+            const matchIndex = matches.findIndex(
+              (match) => match.match_id === match_id
+            );
+
+            if (matchIndex !== -1) {
+              const matchDay = parseInt(matches[matchIndex].date.split(",")[0]);
+              const dayIndex = matchDay - 14;
+
+              newAllScores[dayIndex] = newAllScores[dayIndex] || {
+                homeScores: {},
+                awayScores: {},
+                submitted: false,
+              };
+
+              newAllScores[dayIndex].homeScores[match_id] = home_score;
+              newAllScores[dayIndex].awayScores[match_id] = away_score;
+            }
+          }
+        );
+
+        setAllScores(newAllScores);
+        console.log("all scores data:", newAllScores);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+
+    fetchSavedPredictions();
+  }, []);
+
+  const handleHomeScoreChange = (matchId: number, score: string) => {
     const newScores = { ...allScores };
     newScores[currentDay] = newScores[currentDay] || {
-      homeScores: [],
-      awayScores: [],
+      homeScores: {},
+      awayScores: {},
       submitted: false,
     };
-    newScores[currentDay].homeScores[index] = parseInt(score);
+    newScores[currentDay].homeScores[matchId] = parseInt(score);
     setAllScores(newScores);
+    console.log("handle homescorechange data newScores:", newScores);
   };
 
-  const handleAwayScoreChange = (index: number, score: string) => {
+  const handleAwayScoreChange = (matchId: number, score: string) => {
     const newScores = { ...allScores };
     newScores[currentDay] = newScores[currentDay] || {
-      homeScores: [],
-      awayScores: [],
+      homeScores: {},
+      awayScores: {},
       submitted: false,
     };
-    newScores[currentDay].awayScores[index] = parseInt(score);
+    newScores[currentDay].awayScores[matchId] = parseInt(score);
     setAllScores(newScores);
+    console.log("handle homescorechange data newScores:", newScores);
   };
 
   const handleSubmit = async () => {
     const currentScores = allScores[currentDay] || {
-      homeScores: [],
-      awayScores: [],
+      homeScores: {},
+      awayScores: {},
       submitted: false,
     };
     const submittedMatchIds: number[] = [];
 
     const formData = filteredMatches
-      .map((_, index) => {
-        const match_id = ++globalMatchId;
-        if (!submittedMatchIds.includes(match_id)) {
-          submittedMatchIds.push(match_id);
-          const homeScore = currentScores.homeScores[index];
-          const awayScore = currentScores.awayScores[index];
+      .map((match) => {
+        const matchId = match.match_id;
+        if (!submittedMatchIds.includes(matchId)) {
+          submittedMatchIds.push(matchId);
+          const homeScore = currentScores.homeScores[matchId];
+          const awayScore = currentScores.awayScores[matchId];
 
           if (
             homeScore === undefined ||
@@ -79,7 +152,7 @@ const Matches: React.FC = () => {
           }
 
           return {
-            match_id,
+            match_id: matchId,
             homeScore,
             awayScore,
           };
@@ -118,13 +191,7 @@ const Matches: React.FC = () => {
   };
 
   const handleNextDay = () => {
-    if (allScores[currentDay]?.submitted) {
-      setCurrentDay(currentDay + 1);
-    } else {
-      setUnsuccessfulMessage(
-        "Please submit the scores for the current day first."
-      );
-    }
+    setCurrentDay(currentDay + 1);
   };
 
   const handleLastDay = () => {
@@ -137,28 +204,32 @@ const Matches: React.FC = () => {
   };
 
   const currentScores = allScores[currentDay] || {
-    homeScores: [],
-    awayScores: [],
+    homeScores: {},
+    awayScores: {},
     submitted: false,
   };
 
   return (
     <div className="text-center">
-      <table className="mx-auto table ">
+      <table className="mx-auto table">
         <thead>
           <tr>
             <th className="day-count">Day {currentDay + 1}</th>
           </tr>
         </thead>
         <tbody className="matches-body">
-          {filteredMatches.map((match, index) => (
+          {filteredMatches.map((match) => (
             <MatchRow
-              key={index}
+              key={match.match_id}
               match={match}
-              homeScore={currentScores.homeScores[index]}
-              awayScore={currentScores.awayScores[index]}
-              onHomeScoreChange={(score) => handleHomeScoreChange(index, score)}
-              onAwayScoreChange={(score) => handleAwayScoreChange(index, score)}
+              homeScore={currentScores.homeScores[match.match_id]}
+              awayScore={currentScores.awayScores[match.match_id]}
+              onHomeScoreChange={(score) =>
+                handleHomeScoreChange(match.match_id, score)
+              }
+              onAwayScoreChange={(score) =>
+                handleAwayScoreChange(match.match_id, score)
+              }
               scoresSubmitted={currentScores.submitted}
             />
           ))}
@@ -177,7 +248,6 @@ const Matches: React.FC = () => {
               Last Day
             </Button>
           )}
-
           <span className="mx-2"></span>
           {currentDay < 12 && (
             <Button
@@ -215,19 +285,17 @@ const Matches: React.FC = () => {
             </div>
           )}
         </div>
-        {!currentScores.submitted && (
-          <div className="col-8 text-center">
-            <Button
-              color="success button-hover btn-lg"
-              position="absolute"
-              bottom="200px"
-              left="46%"
-              onClick={handleSubmit}
-            >
-              {"Submit Day " + (currentDay + 1)}
-            </Button>
-          </div>
-        )}
+        <div className="col-8 text-center">
+          <Button
+            color="success button-hover btn-lg"
+            position="absolute"
+            bottom="200px"
+            left="46%"
+            onClick={handleSubmit}
+          >
+            {"Submit Day " + (currentDay + 1)}
+          </Button>
+        </div>
       </div>
     </div>
   );
