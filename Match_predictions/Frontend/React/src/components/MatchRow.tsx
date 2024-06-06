@@ -14,8 +14,8 @@ interface MatchRowProps {
   awayScore: number;
   onHomeScoreChange: (score: string) => void;
   onAwayScoreChange: (score: string) => void;
-  scoresSubmitted: boolean;
-  time: string;
+
+  hasStarted: boolean;
 }
 
 const MatchRow: React.FC<MatchRowProps> = ({
@@ -24,7 +24,8 @@ const MatchRow: React.FC<MatchRowProps> = ({
   awayScore,
   onHomeScoreChange,
   onAwayScoreChange,
-  scoresSubmitted,
+
+  hasStarted,
 }) => {
   const { homeTeam, awayTeam, date, time } = match;
 
@@ -41,27 +42,33 @@ const MatchRow: React.FC<MatchRowProps> = ({
         {homeTeam}
       </td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control score-input"
-          value={homeScore !== undefined ? homeScore.toString() : ""}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onHomeScoreChange(e.target.value)
-          }
-          disabled={scoresSubmitted}
-        />
+        {hasStarted ? (
+          <span>{homeScore !== undefined ? homeScore.toString() : "-"}</span>
+        ) : (
+          <input
+            type="text"
+            className="form-control score-input"
+            value={homeScore !== undefined ? homeScore.toString() : ""}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onHomeScoreChange(e.target.value)
+            }
+          />
+        )}
       </td>
       <td className="align-middle text-center">:</td>
       <td className="align-middle text-center" style={{ width: "50px" }}>
-        <input
-          type="text"
-          className="form-control score-input"
-          value={awayScore !== undefined ? awayScore.toString() : ""}
-          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-            onAwayScoreChange(e.target.value)
-          }
-          disabled={scoresSubmitted}
-        />
+        {hasStarted ? (
+          <span>{awayScore !== undefined ? awayScore.toString() : "-"}</span>
+        ) : (
+          <input
+            type="text"
+            className="form-control score-input"
+            value={awayScore !== undefined ? awayScore.toString() : ""}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onAwayScoreChange(e.target.value)
+            }
+          />
+        )}
       </td>
       <td
         className="align-middle text-center team-name"

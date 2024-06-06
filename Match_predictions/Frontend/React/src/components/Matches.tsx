@@ -133,25 +133,36 @@ const Matches: React.FC = () => {
     };
     const submittedMatchIds: number[] = [];
 
+    // Validate that all scores are provided and are valid numbers
+    let validScores = true;
+    filteredMatches.forEach((match) => {
+      const matchId = match.match_id;
+      const homeScore = currentScores.homeScores[matchId];
+      const awayScore = currentScores.awayScores[matchId];
+
+      if (
+        homeScore === undefined ||
+        awayScore === undefined ||
+        isNaN(homeScore) ||
+        isNaN(awayScore)
+      ) {
+        validScores = false;
+      }
+    });
+
+    if (!validScores) {
+      setUnsuccessfulMessage("Please provide valid scores for all matches.");
+      return;
+    }
+
     const formData = filteredMatches
       .map((match) => {
         const matchId = match.match_id;
+
         if (!submittedMatchIds.includes(matchId)) {
           submittedMatchIds.push(matchId);
           const homeScore = currentScores.homeScores[matchId];
           const awayScore = currentScores.awayScores[matchId];
-
-          if (
-            homeScore === undefined ||
-            awayScore === undefined ||
-            isNaN(homeScore) ||
-            isNaN(awayScore)
-          ) {
-            setUnsuccessfulMessage(
-              "Please provide valid scores for all matches."
-            );
-            return null;
-          }
 
           return {
             match_id: matchId,
@@ -163,11 +174,6 @@ const Matches: React.FC = () => {
         }
       })
       .filter((formData) => formData !== null);
-
-    if (formData.length === 0) {
-      setUnsuccessfulMessage("Please provide valid scores for all matches.");
-      return;
-    }
 
     try {
       const response = await fetch("http://127.0.0.1:5000/predictions", {
@@ -220,22 +226,41 @@ const Matches: React.FC = () => {
           </tr>
         </thead>
         <tbody className="matches-body">
-          {filteredMatches.map((match) => (
-            <MatchRow
-              key={match.match_id}
-              match={match}
-              homeScore={currentScores.homeScores[match.match_id]}
-              awayScore={currentScores.awayScores[match.match_id]}
-              onHomeScoreChange={(score) =>
-                handleHomeScoreChange(match.match_id, score)
-              }
-              onAwayScoreChange={(score) =>
-                handleAwayScoreChange(match.match_id, score)
-              }
-              scoresSubmitted={currentScores.submitted}
-              time={match.time}
-            />
-          ))}
+          {filteredMatches.map((match) => {
+            // Assuming match.date is in the format "DD MMM"
+            const [day, month] = match.date.split(" ");
+            const year = new Date().getFullYear(); // Assuming the current year
+
+            // Getting the month index (0-based) based on the month abbreviation
+            const monthIndex = new Date(
+              Date.parse(`${month} 1, 2000`)
+            ).getMonth();
+
+            // Constructing the date string in MM/DD/YYYY format
+            const formattedDate = `${monthIndex + 1}/${day}/${year}`;
+            console.log("formatted date", formattedDate);
+
+            // Constructing the full datetime string for comparison
+            const matchDateTime = new Date(`${formattedDate} ${match.time}`);
+            console.log("current date", new Date());
+            console.log("Has the game started?", new Date() >= matchDateTime);
+
+            return (
+              <MatchRow
+                key={match.match_id}
+                match={match}
+                homeScore={currentScores.homeScores[match.match_id]}
+                awayScore={currentScores.awayScores[match.match_id]}
+                onHomeScoreChange={(score) =>
+                  handleHomeScoreChange(match.match_id, score)
+                }
+                onAwayScoreChange={(score) =>
+                  handleAwayScoreChange(match.match_id, score)
+                }
+                hasStarted={new Date() >= matchDateTime}
+              />
+            );
+          })}
         </tbody>
       </table>
       <div>
