@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+  const [loggedInUserName, setLoggedInUserName] = useState<string | null>(null);
 
   const handleLeaderboard = async () => {
     try {
@@ -18,7 +19,8 @@ function Leaderboard() {
       }
 
       const data = await response.json();
-      setLeaderboardData(data);
+      setLeaderboardData(data.leaderboardData);
+      setLoggedInUserName(data.loggedInUserName);
       console.log("Data from backend:", data);
     } catch (error) {
       console.error("Error:", error);
@@ -34,7 +36,7 @@ function Leaderboard() {
       <thead>
         <tr>
           <th scope="col">Rank 🏆</th>
-          <th scope="col ">Name</th>
+          <th scope="col">Name</th>
           <th scope="col">Points</th>
           <th scope="col">Age</th>
           <th scope="col">Supporting</th>
@@ -42,7 +44,10 @@ function Leaderboard() {
       </thead>
       <tbody>
         {leaderboardData.map((entry, index) => (
-          <tr key={index}>
+          <tr
+            key={index}
+            className={entry.name === loggedInUserName ? "table-success" : ""}
+          >
             <td>{entry.rank}</td>
             <td>{entry.name}</td>
             <td>{entry.points}</td>

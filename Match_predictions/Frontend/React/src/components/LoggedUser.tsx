@@ -2,7 +2,7 @@ import React from "react";
 import "../App.css";
 
 interface LoggedUserProps {
-  loggedInUserName: string | null;
+  loggedInUserName: string;
 }
 
 const LoggedUser: React.FC<LoggedUserProps> = ({ loggedInUserName }) => {
