@@ -217,13 +217,13 @@ def get_top_charts_data():
 def fetch_match_results():
     try:
         driver = webdriver.Chrome()
-        driver.get("https://www.flashscore.com/football/australia/victoria-premier-league/results/")
+        driver.get("https://www.flashscore.com/football/europe/euro/results/")
         score_home_elements = driver.find_elements(By.CLASS_NAME, "event__score--home")
         score_away_elements = driver.find_elements(By.CLASS_NAME, "event__score--away")
 
         match_data = []
 
-        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 7), start=1):
+        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 36), start=1):
             home_score = home_element.text
             away_score = away_element.text
 

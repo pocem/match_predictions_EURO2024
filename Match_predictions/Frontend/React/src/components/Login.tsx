@@ -113,7 +113,7 @@ function LoginForm({ onLoginSuccess }: LoginFormProps) {
       </div>
       {!formSubmitted && (
         <form onSubmit={handleFormSubmit}>
-          <div className="container-md mt-5">
+          <div className="container-md mt-1">
             <label>
               <input
                 type="text"

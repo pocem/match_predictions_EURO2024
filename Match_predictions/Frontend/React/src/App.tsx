@@ -10,6 +10,7 @@ import Ball from "./components/Ball.tsx";
 import Navbar from "./components/Navbar.tsx";
 import LoggedUser from "./components/LoggedUser.tsx";
 import HomePage from "./components/HomePage.tsx";
+import useWindowSize from "./components/WindowSize";
 
 function App() {
   const [showSignUpForm, setShowSignUpForm] = useState(false);
@@ -64,6 +65,9 @@ function App() {
     setHomePage(true);
   };
 
+  const { width } = useWindowSize();
+  const isSmallScreen = width <= 768;
+
   return (
     <div className="container-fluid text-center main-body mx-auto">
       <Ball />
@@ -72,12 +76,12 @@ function App() {
         <div className="col-2 pl-0">
           <div>{isLoggedIn && <ListGroup />}</div>
         </div>
-        <div className="col-8">
+        <div className={isSmallScreen ? "col-12" : "col-8"}>
           <div className="white-color-text">
             <h1>Match predictor EURO 2024</h1>
             <div>
               {!isLoggedIn && (
-                <h3 id="welcomeText" className="mt-5">
+                <h3 id="welcomeText" className="mt-5 fs-4 fs-md-3 fs-lg-2">
                   Make an account and compete with other players for who is the
                   best football analyst!
                 </h3>
@@ -120,7 +124,10 @@ function App() {
         {isLoggedIn && <LoggedUser loggedInUserName={loggedInUserName} />}
       </div>
       {!isLoggedIn && (
-        <img className="euro-logo mt-5" src="src/images/eurologo.jpg" />
+        <img
+          className="img-fluid euro-logo mt-2 "
+          src="src/images/eurologo.jpg"
+        />
       )}
     </div>
   );

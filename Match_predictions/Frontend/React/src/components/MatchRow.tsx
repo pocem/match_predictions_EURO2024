@@ -14,7 +14,6 @@ interface MatchRowProps {
   awayScore: number;
   onHomeScoreChange: (score: string) => void;
   onAwayScoreChange: (score: string) => void;
-
   hasStarted: boolean;
 }
 
@@ -24,7 +23,6 @@ const MatchRow: React.FC<MatchRowProps> = ({
   awayScore,
   onHomeScoreChange,
   onAwayScoreChange,
-
   hasStarted,
 }) => {
   const { homeTeam, awayTeam, date, time } = match;
@@ -35,13 +33,8 @@ const MatchRow: React.FC<MatchRowProps> = ({
         {date}
       </th>
       <td className="align-middle text-center">{time}</td>
-      <td
-        className="align-middle text-center team-name"
-        style={{ width: "150px" }}
-      >
-        {homeTeam}
-      </td>
-      <td className="align-middle text-center" style={{ width: "50px" }}>
+      <td className="align-middle text-center team-name">{homeTeam}</td>
+      <td className="align-middle text-center">
         {hasStarted ? (
           <span>{homeScore !== undefined ? homeScore.toString() : "-"}</span>
         ) : (
@@ -56,7 +49,7 @@ const MatchRow: React.FC<MatchRowProps> = ({
         )}
       </td>
       <td className="align-middle text-center">:</td>
-      <td className="align-middle text-center" style={{ width: "50px" }}>
+      <td className="align-middle text-center">
         {hasStarted ? (
           <span>{awayScore !== undefined ? awayScore.toString() : "-"}</span>
         ) : (
@@ -70,12 +63,7 @@ const MatchRow: React.FC<MatchRowProps> = ({
           />
         )}
       </td>
-      <td
-        className="align-middle text-center team-name"
-        style={{ width: "150px" }}
-      >
-        {awayTeam}
-      </td>
+      <td className="align-middle text-center team-name">{awayTeam}</td>
     </tr>
   );
 };

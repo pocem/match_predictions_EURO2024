@@ -219,13 +219,15 @@ const Matches: React.FC = () => {
 
   return (
     <div className="text-center">
-      <table className="mx-auto table">
+      <table className="mx-auto mt-5 table col-1">
         <thead>
-          <tr>
-            <th className="day-count">Day {currentDay + 1}</th>
-          </tr>
+          <div className="col-2">
+            <tr>
+              <th className="day-count">Day {currentDay + 1}</th>
+            </tr>
+          </div>
         </thead>
-        <tbody className="matches-body">
+        <tbody>
           {filteredMatches.map((match) => {
             // Assuming match.date is in the format "DD MMM"
             const [day, month] = match.date.split(" ");
@@ -263,64 +265,47 @@ const Matches: React.FC = () => {
           })}
         </tbody>
       </table>
+      <div className="col-6 mx-auto matches-alert">
+        {successMessage && (
+          <div
+            className={`alert alert-success fade-in-out${
+              successMessage ? "" : "hidden"
+            }`}
+            role="alert"
+            onAnimationEnd={handleAnimationEnd}
+          >
+            {successMessage}
+          </div>
+        )}
+        {unsuccessfulMessage && (
+          <div
+            className={`alert alert-danger ${
+              unsuccessfulMessage ? "" : "hidden"
+            }`}
+            role="alert"
+            onAnimationEnd={handleAnimationEnd}
+          >
+            {unsuccessfulMessage}
+          </div>
+        )}
+      </div>
       <div>
-        <div className="d-flex justify-content-center">
+        <div className="button-container">
           {currentDay > 0 && (
-            <Button
-              color="success"
-              position="absolute"
-              bottom="400px"
-              left="34%"
-              onClick={handleLastDay}
-            >
+            <Button color="success" onClick={handleLastDay}>
               Last Day
             </Button>
           )}
           <span className="mx-2"></span>
           {currentDay < 12 && (
-            <Button
-              color="success"
-              position="absolute"
-              bottom="400px"
-              left="61%"
-              onClick={handleNextDay}
-            >
+            <Button color="success" onClick={handleNextDay}>
               Next Day
             </Button>
           )}
         </div>
-        <div className="col-4 mx-auto matches-alert">
-          {successMessage && (
-            <div
-              className={`alert alert-success fade-in-out${
-                successMessage ? "" : "hidden"
-              }`}
-              role="alert"
-              onAnimationEnd={handleAnimationEnd}
-            >
-              {successMessage}
-            </div>
-          )}
-          {unsuccessfulMessage && (
-            <div
-              className={`alert alert-danger ${
-                unsuccessfulMessage ? "" : "hidden"
-              }`}
-              role="alert"
-              onAnimationEnd={handleAnimationEnd}
-            >
-              {unsuccessfulMessage}
-            </div>
-          )}
-        </div>
-        <div className="col-8 text-center">
-          <Button
-            color="success button-hover btn-lg"
-            position="absolute"
-            bottom="200px"
-            left="46%"
-            onClick={handleSubmit}
-          >
+
+        <div className="button-container-submit">
+          <Button color="success button-hover btn-lg" onClick={handleSubmit}>
             {"Submit Day " + (currentDay + 1)}
           </Button>
         </div>

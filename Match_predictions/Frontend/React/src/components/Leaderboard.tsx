@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
+import useWindowSize from "./WindowSize";
 
 function Leaderboard() {
   const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
-  const [loggedInUserName, setLoggedInUserName] = useState<string | null>(null);
+  const [loggedInUserName, setLoggedInUserName] = useState<string>();
 
   const handleLeaderboard = async () => {
     try {
@@ -31,32 +32,40 @@ function Leaderboard() {
     handleLeaderboard();
   }, []);
 
+  const { width } = useWindowSize();
+  const isSmallScreen = width <= 768;
+
   return (
-    <table className="table table-bordered mt-5 text-center">
-      <thead>
-        <tr>
-          <th scope="col">Rank 🏆</th>
-          <th scope="col">Name</th>
-          <th scope="col">Points</th>
-          <th scope="col">Age</th>
-          <th scope="col">Supporting</th>
-        </tr>
-      </thead>
-      <tbody>
-        {leaderboardData.map((entry, index) => (
-          <tr
-            key={index}
-            className={entry.name === loggedInUserName ? "table-success" : ""}
-          >
-            <td>{entry.rank}</td>
-            <td>{entry.name}</td>
-            <td>{entry.points}</td>
-            <td>{entry.age}</td>
-            <td>{entry.supporting_team}</td>
+    <div className="table-container mt-5" style={{ overflowX: "auto" }}>
+      <table
+        className="table table-bordered text-center"
+        style={{ minWidth: isSmallScreen ? "100%" : "auto" }}
+      >
+        <thead>
+          <tr>
+            <th scope="col">Rank 🏆</th>
+            <th scope="col">Name</th>
+            <th scope="col">Points</th>
+            <th scope="col">Age</th>
+            <th scope="col">Supporting</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {leaderboardData.map((entry, index) => (
+            <tr
+              key={index}
+              className={entry.name === loggedInUserName ? "table-success" : ""}
+            >
+              <td>{entry.rank}</td>
+              <td>{entry.name}</td>
+              <td>{entry.points}</td>
+              <td>{entry.age}</td>
+              <td>{entry.supporting_team}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

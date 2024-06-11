@@ -5,6 +5,51 @@
 .button-hover:hover {
 transform: scale(1.1);
 }
+.button-container-submit {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* Aligns items to the bottom */
+  position: fixed;
+  bottom: 100px;
+  width: 100%;
+
+
+  z-index: 1000; /* To ensure it appears above other content */
+}
+@media (max-width: 576px) {
+  .button-container-submit {
+    bottom: 80px; /* Adjust as needed for small screens */
+  }
+}
+
+/* Styles for screens larger than or equal to 576px */
+@media (min-width: 576px) {
+  .button-container-submit {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* For small screens */
+@media (max-width: 576px) {
+  .button-container {
+    position: absolute;
+    bottom: 130px; /* Adjust as needed */
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* For larger screens */
+@media (min-width: 576px) {
+  .button-container {
+    position: absolute;
+    bottom: 400px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 
 .fly-in {
   display: none;
@@ -30,18 +75,13 @@ transform: scale(1.1);
 .date-cell {
   padding-left: 20px;
 }
-.matches-body{
-  position: absolute;
-  top: 300px; 
-  left: 34%
-}
+
 .day-count {
-  position: absolute;
-  top: 220px; /* Adjust this value to set the distance from the bottom */
-  left: 50%;
-  transform: translateX(-50%);
+  display: inline-block;
   font-size: large;
-  border-radius: 10px;
+  border-radius: 5px;
+  text-align: left;
+  
 }
 .main-body{
   background-image: url('images/football bg.jpg');
@@ -97,8 +137,9 @@ transform: scale(1.1);
   top: -200%;
 }
 .matches-alert {
-  position: relative;
-  top: 400px;
+  
+  text-align: center;
+  
 }
 .pointer-cursor {
   cursor: pointer;
@@ -107,10 +148,37 @@ transform: scale(1.1);
   margin-right: 20px;
 }
 
+.navbar-nav .nav-item .btn {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+.corner {
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    align-items: center;
+  }
+  .navbar-nav .nav-item .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    margin: 0.2rem 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-nav .nav-item .btn {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+    margin: 0.1rem 0;
+  }
+}
 
 .logged-user {
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   right: 10px;
   background-color: rgba(255, 255, 255, 0.8); /* Optional: add a background color with some transparency */
   padding: 5px 10px;
@@ -173,40 +241,47 @@ transform: scale(1.1);
 }
 .euro-logo {
   
-  width: 600px;
-  height: 369px;
+  width: 300px;
+  height: 185px;
   border-radius: 10px;
+  top: 600px;
+  
+  
 }
+@media (max-width: 576px) {
+  .euro-logo {
+    width: 150px; /* Adjust width for small screens */
+    height: auto; /* Maintain aspect ratio */
+  }
+}
+/* App.css */
+
+/* Style the table to be responsive */
 .table {
   width: 100%;
   border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 16px;
-  text-align: left;
-  border-radius: 10px;
 
+  font-size: 16px;
+  text-align: center; /* Center align text for better visual balance */
+  
+  position: relative;
 }
 
 .table th,
 .table td {
   padding: 12px 15px;
-
 }
 
 .table th {
   background-color: #f4f4f4;
 }
 
-.table tr:nth-of-type(even) {
-  background-color: #f9f9f9;
-}
 
 .table tr:hover {
   background-color: #f1f1f1;
 }
 
 .table .form-control {
-
   padding: 5px;
   font-size: 16px;
   text-align: center;
@@ -228,11 +303,103 @@ transform: scale(1.1);
   width: 50px;
   text-align: center;
 }
+
 .left-align {
   text-align: left;
   margin-top: 30px;
 }
+
 .spacing {
   display: block;
   margin-top: 15px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  .table .team-name {
+    font-size: 14px;
+  }
+
+  .table .score-input {
+    width: 40px;
+    padding: 4px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .table th,
+  .table td {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .table .team-name {
+    font-size: 12px;
+  }
+
+  .table .score-input {
+    width: 30px;
+    padding: 3px;
+    font-size: 12px;
+  }
+}
+.small-screen .table tr {
+  display: block;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.small-screen .table th,
+.small-screen .table td {
+  padding: 10px;
+}
+
+.small-screen .table .align-middle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.small-screen .table .team-name {
+  font-weight: bold;
+}
+
+.small-screen .form-control {
+  width: 50px;
+  text-align: center;
+}
+
+/* App.css */
+
+/* Responsive styles for smaller screens */
+@media (max-width: 768px) {
+  .content-box {
+    padding: 16px;
+    font-size: 12px;
+  }
+
+  .content-box h1 {
+    font-size: 20px;
+  }
+
+  .content-box p {
+    font-size: 14px;
+  }
+
+  .spacing {
+    margin-top: 5px;
+  }
+}
+
+.match-row-container {
+  display: flex;
+  justify-content: center;
 }

@@ -1,5 +1,6 @@
 import "../App.css";
 import { useState } from "react";
+import useWindowSize from "./WindowSize"; // Import the custom hook
 
 function ParticipantsListGroup() {
   const countriesFbAssociations = {
@@ -30,10 +31,16 @@ function ParticipantsListGroup() {
   };
 
   const [isMinimized, setIsMinimized] = useState(false);
+  const { width } = useWindowSize(); // Get the window width
 
   const toggleMinimized = () => {
     setIsMinimized(!isMinimized);
   };
+
+  // Do not render the component if the screen width is less than 768px
+  if (width < 768) {
+    return null;
+  }
 
   return (
     <>
