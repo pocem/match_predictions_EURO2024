@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the frontend directory
-cd Match_predictions/frontend
+cd Match_predictions/Frontend/React
 
 # Install npm dependencies and build the frontend
 npm install
