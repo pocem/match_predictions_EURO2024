@@ -1,5 +1,5 @@
 import mysql.connector
-from flask import Flask, request, session, jsonify, render_template
+from flask import Flask, request, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_cors import CORS, cross_origin
 from flask_session import Session
