@@ -86,13 +86,16 @@ function SignUpForm() {
     };
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        "https://matchpredict-f88c889f1126.herokuapp.com/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       console.log("Response status:", response.status); // Add this line
 

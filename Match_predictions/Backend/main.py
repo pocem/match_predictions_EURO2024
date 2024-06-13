@@ -9,7 +9,14 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from itertools import islice
 
-mydb = mysql.connector.connect(host="localhost", user="root", passwd="grepolismiso21", database="euro")
+db_config = {
+    'host': 'dz8959rne9lumkkw.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
+    'user': 'y59f8bu8q6txj37l',
+    'password': 'xnmtjsi48whn7sk9',
+    'database': 'euro',
+    'port': 3306
+}
+mydb = mysql.connector.connect(**db_config)
 myCursor = mydb.cursor()
 app = Flask(__name__)
 with open('./.env', 'r') as file:

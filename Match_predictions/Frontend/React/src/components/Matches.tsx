@@ -45,13 +45,16 @@ const Matches: React.FC = () => {
   useEffect(() => {
     const fetchSavedPredictions = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/predictions", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const response = await fetch(
+          "https://matchpredict-f88c889f1126.herokuapp.com/predictions",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
         if (!response.ok) {
           setUnsuccessfulMessage("Failed to fetch saved predictions.");

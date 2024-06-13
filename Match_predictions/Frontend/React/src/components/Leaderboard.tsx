@@ -7,13 +7,16 @@ function Leaderboard() {
 
   const handleLeaderboard = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/leaderboard", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://matchpredict-f88c889f1126.herokuapp.com/leaderboard",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Network response was not ok");
