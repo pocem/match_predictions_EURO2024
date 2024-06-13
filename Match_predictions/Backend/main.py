@@ -13,7 +13,7 @@ db_config = {
     'host': 'dz8959rne9lumkkw.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
     'user': 'y59f8bu8q6txj37l',
     'password': 'xnmtjsi48whn7sk9',
-    'database': 'euro',
+    'database': 'tfvd1qwd96zrl5yp',
     'port': 3306
 }
 mydb = mysql.connector.connect(**db_config)
