@@ -19,10 +19,9 @@ db_config = {
 mydb = mysql.connector.connect(**db_config)
 myCursor = mydb.cursor()
 app = Flask(__name__)
-with open('./.env', 'r') as file:
-    SECRET_KEY = file.read().strip()
 
-app.secret_key = SECRET_KEY
+
+app.secret_key = "youshallSIMPlynotknowthis"
 SESSION_TYPE = "filesystem"
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 app.config.from_object(__name__)
