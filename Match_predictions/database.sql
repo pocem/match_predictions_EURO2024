@@ -3,8 +3,6 @@ CREATE TABLE player (
     password_ VARCHAR(20)
 );
 
-
-
 CREATE TABLE top_charts (
     rank_ INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(20),
@@ -13,8 +11,6 @@ CREATE TABLE top_charts (
     supporting VARCHAR(20),
     FOREIGN KEY (name) REFERENCES player(name) ON DELETE SET NULL
 );
-
-
 
 CREATE TABLE match_predictions (
     match_id INT PRIMARY KEY AUTO_INCREMENT,
