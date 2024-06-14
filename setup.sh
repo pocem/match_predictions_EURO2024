@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Increase Node.js memory limit for npm install
+export NODE_OPTIONS=--max_old_space_size=4096
+
 # Navigate to the frontend directory
 cd Match_predictions/Frontend/React
 
@@ -19,7 +22,7 @@ cd ../../..
 npm install --prefix Match_predictions/Backend
 
 # Ensure Python dependencies are installed (if needed)
-pip install -r Match_predictions/Backend/requirements.txt
+pip install -r requirements.txt
 
 # Start the backend with gunicorn
 exec gunicorn Match_predictions.Backend.main:app
