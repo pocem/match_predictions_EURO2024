@@ -10,7 +10,7 @@ npm install
 npm install @popperjs/core@^2.11.8
 
 # Install vite
-npm install vite
+
 
 # Build the frontend
 npm run build
