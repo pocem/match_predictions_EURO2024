@@ -1,10 +1,9 @@
 import mysql.connector
-from flask import Flask, request, session, jsonify, send_from_directory
+from flask import Flask, request, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 import threading
-import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,15 +18,8 @@ db_config = {
 }
 mydb = mysql.connector.connect(**db_config)
 myCursor = mydb.cursor()
-app = Flask(__name__, static_folder="/Frontend/React/build")
+app = Flask(__name__)
 
-@app.route("/",defaults={"path": ""})
-@app.route("<path:path>")
-def serve(path):
-    if path != "" and os.path.exists(os.path.join(app.static_folder, path)):
-        return send_from_directory(app.static_folder, path)
-    else:
-        return send_from_directory(app.static_folder, "index.html")
 
 
 app.secret_key = "youshallSIMPlynotknowthis"
