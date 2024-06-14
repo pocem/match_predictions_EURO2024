@@ -18,8 +18,7 @@ npm run build
 # Navigate back to the project root
 cd ../../..
 
-# Install npm dependencies for backend
-npm install --prefix Match_predictions/Backend
+npm install -g vite
 
 # Ensure Python dependencies are installed (if needed)
 pip install -r requirements.txt
