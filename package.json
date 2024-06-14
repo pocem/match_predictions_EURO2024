@@ -2,24 +2,21 @@
     "name": "match-predictions-api",
     "version": "1.0.0",
     "description": "Backend API for Euro 2024 match predictions",
-    "main": "main.py",   
+    "main": "main.py",
     "scripts": {
-      "start": "gunicorn Match_predictions.Backend.main:app",  
-      "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
-      "test": "jest"   
+        "start": "gunicorn Match_predictions.Backend.main:app",
+        "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
+        "test": "jest"
     },
     "dependencies": {
-      "express": "^4.17.2",   
-      "@popperjs/core": "^2.11.8"   
+        "@popperjs/core": "^2.11.8",
+        "express": "^4.17.2"
     },
-      
     "devDependencies": {
-      "eslint": "^8.57.0",
-      "jest": "^27.4.7"  
-      
+        "eslint": "^8.57.0",
+        "jest": "^27.4.7"
     },
     "engines": {
-      "node": "18.x"  
+        "node": "18.x"
     }
-  }
-  
+}
