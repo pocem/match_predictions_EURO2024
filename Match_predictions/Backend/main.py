@@ -1,13 +1,24 @@
 import mysql.connector
-from flask import Flask, request, session, jsonify
+from flask import Flask, request, session, jsonify, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
 from flask_cors import CORS, cross_origin
 from flask_session import Session
 import threading
+import os
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from itertools import islice
+
+app = Flask(__name__, static_folder='Frontend/React/build', static_url_path='/')
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory(app.static_folder, path)
 
 db_config = {
     'host': 'dz8959rne9lumkkw.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
