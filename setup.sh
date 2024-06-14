@@ -10,7 +10,7 @@ npm install
 npm install @popperjs/core@^2.11.8
 
 # Build the frontend
-npm run build
+npm run build-frontend-only
 
 # Navigate back to the project root
 cd ../../..

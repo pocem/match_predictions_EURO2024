@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build-frontend": "cd Match_predictions/Frontend/React && npm run build",
-    "build": "npm run build-frontend && npm run build-backend",
+    "build-frontend": "cd Match_predictions/Frontend/React && npm run build-frontend-only",
+    "build-frontend-only": "vite build",
     "build-backend": "echo 'Backend build steps if any'",
+    "build": "npm run build-frontend && npm run build-backend",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start": "vite preview"
   },
