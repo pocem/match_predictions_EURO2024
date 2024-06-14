@@ -5,6 +5,7 @@ export NODE_OPTIONS=--max_old_space_size=4096
 
 # Navigate to the frontend directory
 cd Match_predictions/Frontend/React
+ls
 
 # Install npm dependencies for frontend
 npm install
@@ -13,7 +14,7 @@ npm install
 npm install @popperjs/core@^2.11.8
 
 npm install -g vite
-
+ls
 # Build the frontend
 npm run build
 
