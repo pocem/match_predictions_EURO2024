@@ -12,7 +12,7 @@ npm install
 # Install missing peer dependency for frontend
 npm install @popperjs/core@^2.11.8
 
-npm install -g vite
+npm install vite
 
 # Build the frontend
 npm run build
