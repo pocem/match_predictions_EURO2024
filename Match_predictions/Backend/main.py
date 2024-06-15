@@ -138,8 +138,10 @@ def fetch_player_predictions(username):
 
 player_predictions = []
 
-
 def get_predictions(data):
+    global player_predictions
+    predictions = []
+
     name = session.get("username")
     if not name:
         print("No player name found in session")
@@ -148,46 +150,34 @@ def get_predictions(data):
     print("Session name:", name)
     print(data)
 
-    predictions = fetch_player_predictions(name)
+    player_predictions = fetch_player_predictions(name)
+    max_match_id = player_predictions[-1][0] if player_predictions else 0
+    match_id = max_match_id + 1
 
     for match in data:
-        match_id = match.get("match_id")
-        home_score = match.get("home_score")
-        away_score = match.get("away_score")
+        home_score = match.get("homeScore")
+        away_score = match.get("awayScore")
 
-        if match_id is None or home_score is None or away_score is None:
+        if home_score is None or away_score is None:
             print("Incomplete match data:", match)
             continue
 
-        existing_prediction = next((p for p in predictions if p[0] == match_id), None)
+        try:
+            insert_query = "INSERT INTO player_predictions (name, match_id, home_score, away_score) VALUES (%s, %s, %s, %s)"
+            val = (name, match_id, home_score, away_score)
+            myCursor.execute(insert_query, val)
 
-        if existing_prediction:
-            print(f"Prediction for match_id {match_id} already exists, updating the score.")
-            try:
-                update_query = """
-                    UPDATE player_predictions
-                    SET home_score = %s, away_score = %s
-                    WHERE name = %s AND match_id = %s
-                """
-                val = (home_score, away_score, name, match_id)
-                myCursor.execute(update_query, val)
-            except Exception as e:
-                print("Error updating prediction:", e)
-                continue
-        else:
-            try:
-                insert_query = """
-                    INSERT INTO player_predictions (name, match_id, home_score, away_score)
-                    VALUES (%s, %s, %s, %s)
-                """
-                val = (name, match_id, home_score, away_score)
-                myCursor.execute(insert_query, val)
-            except Exception as e:
-                print("Error inserting prediction:", e)
-                continue
+            predictions.append((match_id, home_score, away_score))
+            match_id += 1
+        except Exception as e:
+            print("Error inserting prediction:", e)
+            continue
 
     mydb.commit()
-    return True
+    player_predictions.extend(predictions)
+    print("Predictions added:", player_predictions)
+    return player_predictions
+
 
 def top_charts():
     myCursor.execute("SELECT name, age, supporting, points FROM top_charts")
@@ -425,17 +415,20 @@ def logout():
 @cross_origin(supports_credentials=True)
 def predictions():
     data = request.get_json()
-    name = session.get('username')
+    name = session.get('_user_id')
 
+    print("session name:", name)
     if name:
         success = get_predictions(data)
         if success:
+            print("Predictions saved.")
             return jsonify({"message": "Predictions saved."}), 200
         else:
-            return jsonify({"error": "Failed to save predictions."}), 500
+            print("No player name provided. No success")
+            return jsonify({"error": "No player name provided."}), 500
     else:
+        print("No player name provided in session")
         return jsonify({"error": "No player name provided."}), 400
-
 
 
 @app.route('/predictions', methods=['GET'])
