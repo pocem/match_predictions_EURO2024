@@ -7,7 +7,10 @@ import threading
 import os
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from itertools import islice
 
 app = Flask(__name__, static_folder='Frontend/React/build', static_url_path='/')
@@ -234,14 +237,25 @@ def get_top_charts_data():
 #RETURNS A LIST OF MATCH RESULTS FROM WEB WITH EACH HAVING MATCH_ID, HOME SCORE AND AWAY SCORE
 def fetch_match_results():
     try:
-        driver = webdriver.Chrome()
+        # Set up Chrome options
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Ensure GUI is off
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920x1080")
+
+        # Initialize the Chrome driver
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+
         driver.get("https://www.flashscore.com/football/europe/euro/results/")
         score_home_elements = driver.find_elements(By.CLASS_NAME, "event__score--home")
         score_away_elements = driver.find_elements(By.CLASS_NAME, "event__score--away")
 
         match_data = []
 
-        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 36), start=1):
+        for index, (home_element, away_element) in enumerate(islice(zip(score_home_elements, score_away_elements), 36),
+                                                             start=1):
             home_score = home_element.text
             away_score = away_element.text
 
