@@ -1,3 +1,4 @@
+import bcrypt
 import mysql.connector
 from flask import Flask, request, session, jsonify, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
@@ -34,8 +35,6 @@ mydb = mysql.connector.connect(**db_config)
 myCursor = mydb.cursor()
 app = Flask(__name__)
 
-
-
 app.secret_key = "youshallSIMPlynotknowthis"
 SESSION_TYPE = "filesystem"
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
@@ -54,8 +53,11 @@ def signup(name, password, age, supportingTeam):
         print("Name already exists in the database.")
         return {"error": "Name already exists"}, 400
 
+    # Hash the password
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
     insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
-    val = (name, password)
+    val = (name, hashed_password)
     myCursor.execute(insert_player_query, val)
     mydb.commit()
 
@@ -77,7 +79,8 @@ def login(name, password):
         print(result)
 
         if result:
-            if result[0] == password:
+            # Verify the hashed password
+            if bcrypt.checkpw(password.encode('utf-8'), result[0].encode('utf-8')):
                 print("Login successful!")
                 return {"message": "Login successful"}
             else:
@@ -115,7 +118,6 @@ class User(UserMixin):
 
     def get_id(self):
         return self.name
-
 def get_matches():
     myCursor.execute("SELECT match_id, home_team_score, away_team_score FROM match_predictions")
     return myCursor.fetchall()
