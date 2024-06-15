@@ -148,17 +148,18 @@ def get_predictions(data):
         return False
 
     print("Session name:", name)
-    print(data)
+    print("Received data:", data)
 
     player_predictions = fetch_player_predictions(name)
     max_match_id = player_predictions[-1][0] if player_predictions else 0
     match_id = max_match_id + 1
 
     for match in data:
+        match_id = match.get("match_id")
         home_score = match.get("homeScore")
         away_score = match.get("awayScore")
 
-        if home_score is None or away_score is None:
+        if match_id is None or home_score is None or away_score is None:
             print("Incomplete match data:", match)
             continue
 
@@ -168,7 +169,6 @@ def get_predictions(data):
             myCursor.execute(insert_query, val)
 
             predictions.append((match_id, home_score, away_score))
-            match_id += 1
         except Exception as e:
             print("Error inserting prediction:", e)
             continue
@@ -417,7 +417,7 @@ def predictions():
     data = request.get_json()
     name = session.get('_user_id')
 
-    print("session name:", name)
+    print("Session name:", name)
     if name:
         success = get_predictions(data)
         if success:
