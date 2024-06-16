@@ -1,4 +1,4 @@
-
+import bcrypt
 import mysql.connector
 from flask import Flask, request, session, jsonify, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
@@ -360,11 +360,11 @@ def signup_route():
 def login_web():
     data = request.get_json()
     print("Received login data:", data)
-    name = data.get('name').strip()
-    password = data.get('password').strip()
+    name = data.get('name')
+    password = data.get('password')
+
 
     user = User.get(name)
-    print(f"User fetched: {user}")
 
     if user and user.password == password:
         login_user(user)
@@ -373,7 +373,9 @@ def login_web():
         print("User", session["username"], "logged in.")
         print("Session name login:", name)
 
+        # Call periodic_fetch with the username
         threading.Thread(target=periodic_fetch).start()
+
         return jsonify(fetch_player_predictions(name)), 200
     else:
         return jsonify({"message": "Incorrect username or password"}), 401
