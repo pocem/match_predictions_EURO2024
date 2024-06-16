@@ -381,21 +381,25 @@ def login_web():
     name = data.get('name')
     password = data.get('password')
 
-    user = User.get(name)
+    try:
+        user = User.get(name)
 
-    if user and user.password == password:
-        login_user(user)
-        session["username"] = user.name
-        session.modified = True
-        print("User", session["username"], "logged in.")
-        print("Session name login:", name)
+        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            login_user(user)
+            session["username"] = user.name
+            session.modified = True
+            print("User", session["username"], "logged in.")
+            print("Session name login:", name)
 
-        # Call periodic_fetch with the username
-        threading.Thread(target=periodic_fetch).start()
+            # Call periodic_fetch with the username
+            threading.Thread(target=periodic_fetch).start()
 
-        return jsonify(fetch_player_predictions(name)), 200
-    else:
-        return jsonify({"message": "Incorrect username or password"}), 401
+            return jsonify(fetch_player_predictions(name)), 200
+        else:
+            return jsonify({"message": "Incorrect username or password"}), 401
+    except Exception as e:
+        print("An error occurred during login:", e)
+        return jsonify({"message": "An internal error occurred"}), 500
 
 
 @login_manager.user_loader
