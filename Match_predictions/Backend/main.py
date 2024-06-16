@@ -44,6 +44,28 @@ Session(app)
 CORS(app, supports_credentials=True)
 
 # SIGNUP--------------------------------------------------
+def signup(name, password, age, supportingTeam):
+    check_name_query = "SELECT name FROM player WHERE name = %s"
+    myCursor.execute(check_name_query, (name,))
+    existing_name = myCursor.fetchone()
+
+    if existing_name is not None:
+        print("Name already exists in the database.")
+        return {"error": "Name already exists"}, 400
+
+    insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
+    val = (name, password)
+    myCursor.execute(insert_player_query, val)
+    mydb.commit()
+
+    insert_top_charts_query = "INSERT INTO top_charts (name, age, supporting, points) VALUES (%s, %s, %s, %s)"
+    val = (name, age, supportingTeam, 0)
+    myCursor.execute(insert_top_charts_query, val)
+    mydb.commit()
+
+    print("Signup successful!")
+    return {"message": "Signup successful"}, 200
+
 
 
 # LOGIN---------------------------------------------
@@ -313,9 +335,10 @@ def matches():
     print("hit")
     return get_matches()
 
-app.route('/signup', methods=['POST'])
+
+@app.route('/signup', methods=['POST'])
 @cross_origin(supports_credentials=True)
-def signup():
+def signup_route():
     data = request.get_json()
     name = data.get('name').strip()
     password = data.get('password').strip()
@@ -326,27 +349,12 @@ def signup():
         return jsonify({"message": "Missing fields"}), 400
 
     try:
-        check_name_query = "SELECT name FROM player WHERE name = %s"
-        myCursor.execute(check_name_query, (name,))
-        existing_name = myCursor.fetchone()
-
-        if existing_name is not None:
-            print("Name already exists in the database.")
-            return jsonify({"message": "Name already exists"}), 400
-
-        insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
-        myCursor.execute(insert_player_query, (name, password))
-        mydb.commit()
-
-        insert_top_charts_query = "INSERT INTO top_charts (name, age, supporting, points) VALUES (%s, %s, %s, %s)"
-        myCursor.execute(insert_top_charts_query, (name, age, supportingTeam, 0))
-        mydb.commit()
-
-        print("Signup successful!")
-        return jsonify({"message": "Signup successful"}), 200
+        response = signup(name, password, age, supportingTeam)
+        return jsonify(response), 200
     except Exception as e:
         print(f"Error during signup: {e}")
         return jsonify({"message": "An error occurred during signup"}), 500
+
 @app.route('/login', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def login_web():
@@ -354,12 +362,11 @@ def login_web():
     print("Received login data:", data)
     name = data.get('name').strip()
     password = data.get('password').strip()
-    print(f"Processing login for: {name}")
 
     user = User.get(name)
+    print(f"User fetched: {user}")
 
     if user and user.password == password:
-        print(f"Password match for user: {name}")
         login_user(user)
         session["username"] = user.name
         session.modified = True
@@ -367,13 +374,9 @@ def login_web():
         print("Session name login:", name)
 
         threading.Thread(target=periodic_fetch).start()
-
         return jsonify(fetch_player_predictions(name)), 200
     else:
-        print("Incorrect username or password")
         return jsonify({"message": "Incorrect username or password"}), 401
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
