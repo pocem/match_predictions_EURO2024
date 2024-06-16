@@ -339,10 +339,10 @@ def matches():
 @cross_origin(supports_credentials=True)
 def signup_route():
     data = request.get_json()
-    name = data.get('name').strip()
-    password = data.get('password').strip()
+    name = data.get('name')
+    password = data.get('password')
     age = data.get('age')
-    supportingTeam = data.get('supportingTeam')
+    supportingTeam = data.get('team')
 
     if not name or not password or not age or not supportingTeam:
         return jsonify({"message": "Missing fields"}), 400
