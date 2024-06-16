@@ -1,4 +1,4 @@
-import bcrypt
+
 import mysql.connector
 from flask import Flask, request, session, jsonify, send_from_directory
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user
@@ -53,11 +53,8 @@ def signup(name, password, age, supportingTeam):
         print("Name already exists in the database.")
         return {"error": "Name already exists"}, 400
 
-    # Hash the password
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-
     insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
-    val = (name, hashed_password)
+    val = (name, password)
     myCursor.execute(insert_player_query, val)
     mydb.commit()
 
@@ -69,6 +66,7 @@ def signup(name, password, age, supportingTeam):
     print("Signup successful!")
     return {"message": "Signup successful"}, 200
 
+
 # LOGIN---------------------------------------------
 def login(name, password):
     print(name)
@@ -79,8 +77,7 @@ def login(name, password):
         print(result)
 
         if result:
-            # Verify the hashed password
-            if bcrypt.checkpw(password.encode('utf-8'), result[0].encode('utf-8')):
+            if password == result[0]:
                 print("Login successful!")
                 return {"message": "Login successful"}
             else:
@@ -381,25 +378,21 @@ def login_web():
     name = data.get('name')
     password = data.get('password')
 
-    try:
-        user = User.get(name)
+    user = User.get(name)
 
-        if user and bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
-            login_user(user)
-            session["username"] = user.name
-            session.modified = True
-            print("User", session["username"], "logged in.")
-            print("Session name login:", name)
+    if user and user.password == password:
+        login_user(user)
+        session["username"] = user.name
+        session.modified = True
+        print("User", session["username"], "logged in.")
+        print("Session name login:", name)
 
-            # Call periodic_fetch with the username
-            threading.Thread(target=periodic_fetch).start()
+        # Call periodic_fetch with the username
+        threading.Thread(target=periodic_fetch).start()
 
-            return jsonify(fetch_player_predictions(name)), 200
-        else:
-            return jsonify({"message": "Incorrect username or password"}), 401
-    except Exception as e:
-        print("An error occurred during login:", e)
-        return jsonify({"message": "An internal error occurred"}), 500
+        return jsonify(fetch_player_predictions(name)), 200
+    else:
+        return jsonify({"message": "Incorrect username or password"}), 401
 
 
 @login_manager.user_loader
