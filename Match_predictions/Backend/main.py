@@ -48,7 +48,6 @@ def signup(name, password, age, supportingTeam):
     check_name_query = "SELECT name FROM player WHERE name = %s"
     myCursor.execute(check_name_query, (name,))
     existing_name = myCursor.fetchone()
-
     if existing_name is not None:
         print("Name already exists in the database.")
         return {"error": "Name already exists"}, 400
