@@ -44,60 +44,9 @@ Session(app)
 CORS(app, supports_credentials=True)
 
 # SIGNUP--------------------------------------------------
-def signup(name, password, age, supportingTeam):
-    check_name_query = "SELECT name FROM player WHERE name = %s"
-    myCursor.execute(check_name_query, (name,))
-    existing_name = myCursor.fetchone()
-
-    if existing_name is not None:
-        print("Name already exists in the database.")
-        return {"error": "Name already exists"}, 400
-
-    insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
-    val = (name, password)
-    myCursor.execute(insert_player_query, val)
-    mydb.commit()
-
-    insert_top_charts_query = "INSERT INTO top_charts (name, age, supporting, points) VALUES (%s, %s, %s, %s)"
-    val = (name, age, supportingTeam, 0)
-    myCursor.execute(insert_top_charts_query, val)
-    mydb.commit()
-
-    print("Signup successful!")
-    return {"message": "Signup successful"}, 200
 
 
 # LOGIN---------------------------------------------
-def login(name, password):
-    print(name)
-    try:
-        sql = "SELECT password_ FROM player WHERE name = %s"
-        myCursor.execute(sql, (name,))
-        result = myCursor.fetchone()
-        print(result)
-
-        if result:
-            if password == result[0]:
-                print("Login successful!")
-                return {"message": "Login successful"}
-            else:
-                print("Incorrect password. Please try again.")
-                return {"message": "Incorrect password"}
-        else:
-            print("Name not found. Please check your credentials or sign up.")
-            return {"message": "Name not found"}
-    except Exception as e:
-        print("An error occurred while querying the database:", e)
-        return {"message": "An error occurred while querying the database"}
-
-player_credentials = {}
-
-myCursor.execute("SELECT name, password_ FROM player")
-signup_data = myCursor.fetchall()
-
-for name, password in signup_data:
-    player_credentials[name] = {'password': password}
-
 class User(UserMixin):
     def __init__(self, name, password):
         self.name = name
@@ -105,12 +54,18 @@ class User(UserMixin):
 
     @staticmethod
     def get(name):
-        user_data_query = "SELECT password_ FROM player WHERE name = %s"
-        myCursor.execute(user_data_query, (name,))
-        user_password = myCursor.fetchone()
-        if user_password:
-            return User(name, user_password[0])
-        else:
+        try:
+            user_data_query = "SELECT password_ FROM player WHERE name = %s"
+            myCursor.execute(user_data_query, (name,))
+            user_password = myCursor.fetchone()
+            if user_password:
+                print(f"User found in DB: {name} with password: {user_password[0]}")
+                return User(name, user_password[0])
+            else:
+                print(f"User {name} not found in DB")
+                return None
+        except Exception as e:
+            print(f"Error querying user {name} from DB: {e}")
             return None
 
     def get_id(self):
@@ -358,40 +313,64 @@ def matches():
     print("hit")
     return get_matches()
 
-@app.route('/signup', methods=['POST'])
-def signup_web():
+app.route('/signup', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def signup():
     data = request.get_json()
-    print("Received signup data:", data)
-    name = data.get('name')
-    password = data.get('password')
+    name = data.get('name').strip()
+    password = data.get('password').strip()
     age = data.get('age')
-    supporting_team = data.get('team')
+    supportingTeam = data.get('supportingTeam')
 
-    message, status_code = signup(name, password, age, supporting_team)
-    return jsonify(message), status_code
+    if not name or not password or not age or not supportingTeam:
+        return jsonify({"message": "Missing fields"}), 400
 
+    try:
+        check_name_query = "SELECT name FROM player WHERE name = %s"
+        myCursor.execute(check_name_query, (name,))
+        existing_name = myCursor.fetchone()
+
+        if existing_name is not None:
+            print("Name already exists in the database.")
+            return jsonify({"message": "Name already exists"}), 400
+
+        insert_player_query = "INSERT INTO player (name, password_) VALUES (%s, %s)"
+        myCursor.execute(insert_player_query, (name, password))
+        mydb.commit()
+
+        insert_top_charts_query = "INSERT INTO top_charts (name, age, supporting, points) VALUES (%s, %s, %s, %s)"
+        myCursor.execute(insert_top_charts_query, (name, age, supportingTeam, 0))
+        mydb.commit()
+
+        print("Signup successful!")
+        return jsonify({"message": "Signup successful"}), 200
+    except Exception as e:
+        print(f"Error during signup: {e}")
+        return jsonify({"message": "An error occurred during signup"}), 500
 @app.route('/login', methods=['POST'])
 @cross_origin(supports_credentials=True)
 def login_web():
     data = request.get_json()
     print("Received login data:", data)
-    name = data.get('name')
-    password = data.get('password')
+    name = data.get('name').strip()
+    password = data.get('password').strip()
+    print(f"Processing login for: {name}")
 
     user = User.get(name)
 
     if user and user.password == password:
+        print(f"Password match for user: {name}")
         login_user(user)
         session["username"] = user.name
         session.modified = True
         print("User", session["username"], "logged in.")
         print("Session name login:", name)
 
-        # Call periodic_fetch with the username
         threading.Thread(target=periodic_fetch).start()
 
         return jsonify(fetch_player_predictions(name)), 200
     else:
+        print("Incorrect username or password")
         return jsonify({"message": "Incorrect username or password"}), 401
 
 
