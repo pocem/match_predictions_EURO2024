@@ -6,6 +6,7 @@ from flask_cors import CORS, cross_origin
 from flask_session import Session
 import threading
 import os
+from dotenv import load_dotenv
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -13,6 +14,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from itertools import islice
+
 
 app = Flask(__name__, static_folder='Frontend/React/build', static_url_path='/')
 
@@ -24,18 +26,27 @@ def serve_index():
 def serve_static(path):
     return send_from_directory(app.static_folder, path)
 
+load_dotenv()
+
+host =  os.getenv("HOST")
+user = os.getenv("USER")
+password = os.getenv("PASSWORD")
+database = os.getenv("DATABASE")
+
+secret_key = os.getenv("SECRET_KEY")
+
 db_config = {
-    'host': 'dz8959rne9lumkkw.chr7pe7iynqr.eu-west-1.rds.amazonaws.com',
-    'user': 'y59f8bu8q6txj37l',
-    'password': 'xnmtjsi48whn7sk9',
-    'database': 'tfvd1qwd96zrl5yp',
+    'host': host,
+    'user': user,
+    'password': password,
+    'database': database,
     'port': 3306
 }
 mydb = mysql.connector.connect(**db_config)
 myCursor = mydb.cursor()
 app = Flask(__name__)
 
-app.secret_key = "youshallSIMPlynotknowthis"
+app.secret_key = secret_key
 SESSION_TYPE = "filesystem"
 app.config.update(SESSION_COOKIE_SAMESITE="None", SESSION_COOKIE_SECURE=True)
 app.config.from_object(__name__)
@@ -443,6 +454,4 @@ def get_leaderboard_data():
     })
 
 if __name__ == '__main__':
-    # periodic_fetch()
-
     app.run(debug=True)
